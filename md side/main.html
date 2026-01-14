@@ -1,0 +1,42 @@
+<!-- Frontend/dashboard.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+  <!-- Your dashboard content -->
+  <div id="chatMessages"></div>
+  <input id="chatInput" type="text">
+  <button onclick="sendChat('student', 'student123', document.getElementById('chatInput').value)">Send</button>
+
+  <script>
+    function sendChat(role, name, message) {
+      fetch('http://localhost:4000/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fromRole: role, fromName: name, message: message })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success) loadChats();
+      });
+    }
+
+    function loadChats() {
+      fetch('http://localhost:4000/api/chat')
+        .then(res => res.json())
+        .then(chats => {
+          const chatBox = document.getElementById('chatMessages');
+          chatBox.innerHTML = '';
+          chats.forEach(chat => {
+            chatBox.innerHTML += `<div><b>[${chat.fromRole}] ${chat.fromName}:</b> ${chat.message}</div>`;
+          });
+        });
+    }
+
+    // Load chats on page load
+    loadChats();
+  </script>
+</body>
+</html>

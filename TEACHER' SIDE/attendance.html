@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mark Attendance</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .progress-circle {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      display: inline-block;
+    }
+    .progress-circle svg {
+      transform: rotate(-90deg);
+    }
+    .progress-circle .progress-value {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem; font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <button class="btn btn-outline-light d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="MAIN.HTML">HINDU SHIKSHA SAMITI - Teacher</a>
+      <span class="navbar-text text-white ms-auto">Teacher Portal</span>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard.html">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="attendance.html">
+            <i class="bi bi-calendar-check me-2"></i> Mark Attendance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="students.html">
+            <i class="bi bi-people me-2"></i> Students List
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reports.html">
+            <i class="bi bi-file-earmark-text me-2"></i> Reports & Remarks
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="attendance.html">
+          <i class="bi bi-calendar-check me-2"></i> Mark Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="students.html">
+          <i class="bi bi-people me-2"></i> Students List
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="reports.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports & Remarks
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <h2>Mark Attendance</h2>
+      <form id="attendanceForm" class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label for="classSelect" class="form-label">Select Class</label>
+          <select class="form-select" id="classSelect" required>
+            <option value="10A">Class 10 - Section A</option>
+            <option value="10B">Class 10 - Section B</option>
+            <option value="12A">Class 12 - Section A</option>
+            <option value="12B">Class 12 - Section B</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label for="dateSelect" class="form-label">Date</label>
+          <input type="date" class="form-control" id="dateSelect" required>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="button" class="btn btn-primary" onclick="loadStudents()">Load Students</button>
+        </div>
+      </form>
+
+      <!-- Add this search/filter form above the attendanceSection -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <label for="searchDate" class="form-label">Search by Date</label>
+          <input type="date" class="form-control" id="searchDate">
+        </div>
+        <div class="col-md-4">
+          <label for="searchClass" class="form-label">Search by Class</label>
+          <select class="form-select" id="searchClass">
+            <option value="">All Classes</option>
+            <option value="10A">Class 10 - Section A</option>
+            <option value="10B">Class 10 - Section B</option>
+            <option value="12A">Class 12 - Section A</option>
+            <option value="12B">Class 12 - Section B</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+          <button type="button" class="btn btn-secondary" onclick="showAbsentList()">Show Absentees</button>
+        </div>
+      </div>
+
+      <!-- Absentees List by Day -->
+      <div id="absenteesDaySection" class="mb-4" style="display:none;">
+        <h5>Absentees List (<span id="absentDayLabel"></span>)</h5>
+        <ul id="absenteesDayList" class="list-group"></ul>
+      </div>
+
+      <div id="attendanceSection" style="display:none;">
+        <h4 class="mb-3">Student List</h4>
+        <form id="markAttendanceForm">
+          <table class="table table-bordered align-middle">
+            <thead>
+              <tr>
+                <th>Roll No.</th>
+                <th>Name</th>
+                <th>Present</th>
+                <th>Absent</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTable">
+              <!-- Students will be loaded here -->
+            </tbody>
+          </table>
+          <button type="submit" class="btn btn-success">Submit Attendance</button>
+        </form>
+      </div>
+
+      <div id="progressSection" class="mt-5" style="display:none;">
+        <h4>Attendance Progress</h4>
+        <div class="d-flex align-items-center gap-4">
+          <div class="progress-circle" id="progressCircle">
+            <!-- SVG Circle will be rendered here -->
+            <div class="progress-value" id="progressValue">0%</div>
+          </div>
+          <div>
+            <p class="mb-1"><b>Total Students:</b> <span id="totalStudents">0</span></p>
+            <p class="mb-1 text-success"><b>Present:</b> <span id="presentCount">0</span></p>
+            <p class="mb-1 text-danger"><b>Absent:</b> <span id="absentCount">0</span></p>
+          </div>
+        </div>
+        <div class="mt-4">
+          <h5>Absent Students</h5>
+          <ul id="absentList" class="list-group"></ul>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sample students data (replace with backend fetch later)
+    const studentsData = {
+      "10A": [
+        { roll: 1, name: "Rahul Mehra" },
+        { roll: 2, name: "Priya Verma" },
+        { roll: 3, name: "Aman Kumar" },
+        { roll: 4, name: "Sneha Patel" },
+        { roll: 5, name: "Tanvi Mishra" },
+        { roll: 6, name: "Aditya Singh" },
+        { roll: 7, name: "Vikas Joshi" },
+        { roll: 8, name: "Megha Jain" },
+        { roll: 9, name: "Karan Malhotra" },
+        { roll: 10, name: "Shivani Chauhan" },
+        { roll: 11, name: "Harsh Vardhan" },
+        { roll: 12, name: "Pooja Desai" },
+        { roll: 13, name: "Deepak Saini" },
+        { roll: 14, name: "Riya Kapoor" },
+        { roll: 15, name: "Simran Kaur" },
+        { roll: 16, name: "Arjun Yadav" },
+        { roll: 17, name: "Neha Sharma" },
+        { roll: 18, name: "Manish Agarwal" },
+        { roll: 19, name: "Rohit Singh" },
+        { roll: 20, name: "Anjali Gupta" },
+        { roll: 21, name: "Rahul Sharma" },
+        { roll: 22, name: "Sakshi Jain" },
+        { roll: 23, name: "Amit Soni" },
+        { roll: 24, name: "Nisha Kumari" },
+        { roll: 25, name: "Saurabh Mishra" },
+        { roll: 26, name: "Divya Singh" },
+        { roll: 27, name: "Akash Gupta" },
+        { roll: 28, name: "Priyanka Yadav" },
+        { roll: 29, name: "Vivek Kumar" },
+        { roll: 30, name: "Ritu Sharma" },
+        { roll: 31, name: "Sandeep Verma" },
+        { roll: 32, name: "Kavita Joshi" },
+        { roll: 33, name: "Aakash Mehta" },
+        { roll: 34, name: "Sneha Sinha" },
+        { roll: 35, name: "Gaurav Singh" },
+        { roll: 36, name: "Pankaj Kumar" },
+        { roll: 37, name: "Jyoti Sharma" },
+        { roll: 38, name: "Rakesh Yadav" },
+        { roll: 39, name: "Sunita Devi" },
+        { roll: 40, name: "Vishal Chauhan" },
+        { roll: 41, name: "Aarti Gupta" },
+        { roll: 42, name: "Nitin Sharma" },
+        { roll: 43, name: "Shweta Singh" },
+        { roll: 44, name: "Rajeev Ranjan" },
+        { roll: 45, name: "Komal Agarwal" },
+        { roll: 46, name: "Sahil Khan" },
+        { roll: 47, name: "Ankita Mehra" },
+        { roll: 48, name: "Yash Raj" },
+        { roll: 49, name: "Rachna Kumari" },
+        { roll: 50, name: "Sumit Saini" },
+        { roll: 51, name: "Payal Sharma" },
+        { roll: 52, name: "Mohit Verma" },
+        { roll: 53, name: "Ritika Singh" },
+        { roll: 54, name: "Amanpreet Kaur" },
+        { roll: 55, name: "Siddharth Jain" }
+      ],
+      "10B": [
+        { roll: 1, name: "Tanvi Mishra" },
+        { roll: 2, name: "Aditya Singh" },
+        { roll: 3, name: "Vikas Joshi" }
+      ],
+      "12A": [
+        { roll: 1, name: "Megha Jain" },
+        { roll: 2, name: "Karan Malhotra" },
+        { roll: 3, name: "Shivani Chauhan" }
+      ],
+      "12B": [
+        { roll: 1, name: "Harsh Vardhan" },
+        { roll: 2, name: "Pooja Desai" }
+      ]
+    };
+
+    function loadStudents() {
+      const classVal = document.getElementById('classSelect').value;
+      const students = studentsData[classVal] || [];
+      const tbody = document.getElementById('studentsTable');
+      tbody.innerHTML = '';
+      students.forEach(stu => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${stu.roll}</td>
+            <td>${stu.name}</td>
+            <td><input type="radio" name="attendance_${stu.roll}" value="present" checked></td>
+            <td><input type="radio" name="attendance_${stu.roll}" value="absent"></td>
+          </tr>
+        `;
+      });
+      document.getElementById('attendanceSection').style.display = students.length ? '' : 'none';
+      document.getElementById('progressSection').style.display = 'none';
+    }
+
+    // Store attendance records by date and class (simulate backend)
+    const attendanceRecords = {};
+
+    // Update markAttendanceForm submit handler to save absentees by date/class
+    document.getElementById('markAttendanceForm').onsubmit = function(e) {
+      e.preventDefault();
+      const classVal = document.getElementById('classSelect').value;
+      const dateVal = document.getElementById('dateSelect').value;
+      const students = studentsData[classVal] || [];
+      let present = 0, absent = 0, absentList = [];
+      students.forEach(stu => {
+        const status = document.querySelector(`input[name="attendance_${stu.roll}"]:checked`).value;
+        if (status === "present") present++;
+        else {
+          absent++;
+          absentList.push(stu.name + " (Roll " + stu.roll + ")");
+        }
+      });
+      // Save absentees for this date/class
+      if (!attendanceRecords[dateVal]) attendanceRecords[dateVal] = {};
+      attendanceRecords[dateVal][classVal] = absentList;
+
+      // Progress Meter
+      const percent = students.length ? Math.round((present / students.length) * 100) : 0;
+      drawProgress(percent);
+      document.getElementById('progressValue').textContent = percent + "%";
+      document.getElementById('totalStudents').textContent = students.length;
+      document.getElementById('presentCount').textContent = present;
+      document.getElementById('absentCount').textContent = absent;
+      // Absent List
+      const absentUl = document.getElementById('absentList');
+      absentUl.innerHTML = '';
+      absentList.forEach(name => {
+        const li = document.createElement('li');
+        li.className = "list-group-item list-group-item-danger";
+        li.textContent = name;
+        absentUl.appendChild(li);
+      });
+      document.getElementById('progressSection').style.display = '';
+    };
+
+    // Show absentees by selected day/class
+    function showAbsentList() {
+      const date = document.getElementById('searchDate').value;
+      const classVal = document.getElementById('searchClass').value;
+      const absenteesDaySection = document.getElementById('absenteesDaySection');
+      const absenteesDayList = document.getElementById('absenteesDayList');
+      const absentDayLabel = document.getElementById('absentDayLabel');
+      absenteesDayList.innerHTML = '';
+      let found = false;
+      if (attendanceRecords[date]) {
+        if (classVal) {
+          const absentees = attendanceRecords[date][classVal] || [];
+          absentDayLabel.textContent = `${date} - ${classVal}`;
+          absentees.forEach(name => {
+            const li = document.createElement('li');
+            li.className = "list-group-item list-group-item-danger";
+            li.textContent = name;
+            absenteesDayList.appendChild(li);
+          });
+          found = absentees.length > 0;
+        } else {
+          // Show for all classes
+          absentDayLabel.textContent = `${date} - All Classes`;
+          Object.keys(attendanceRecords[date]).forEach(cls => {
+            const absentees = attendanceRecords[date][cls];
+            if (absentees.length > 0) {
+              const li = document.createElement('li');
+              li.className = "list-group-item list-group-item-secondary";
+              li.textContent = `Class ${cls}:`;
+              absenteesDayList.appendChild(li);
+              absentees.forEach(name => {
+                const liStu = document.createElement('li');
+                liStu.className = "list-group-item list-group-item-danger ms-3";
+                liStu.textContent = name;
+                absenteesDayList.appendChild(liStu);
+              });
+              found = true;
+            }
+          });
+        }
+      }
+      absenteesDaySection.style.display = found ? '' : 'none';
+      if (!found) {
+        absentDayLabel.textContent = `${date}${classVal ? ' - ' + classVal : ''}`;
+        const li = document.createElement('li');
+        li.className = "list-group-item";
+        li.textContent = "No absentees found for this selection.";
+        absenteesDayList.appendChild(li);
+        absenteesDaySection.style.display = '';
+      }
+    }
+
+    function drawProgress(percent) {
+      const circle = 2 * Math.PI * 45;
+      const progress = (percent / 100) * circle;
+      document.getElementById('progressCircle').innerHTML = `
+        <svg width="100" height="100">
+          <circle cx="50" cy="50" r="45" stroke="#e9ecef" stroke-width="10" fill="none"/>
+          <circle cx="50" cy="50" r="45" stroke="#198754" stroke-width="10" fill="none"
+            stroke-dasharray="${progress} ${circle}" stroke-linecap="round"/>
+        </svg>
+        <div class="progress-value" id="progressValue">${percent}%</div>
+      `;
+    }
+  </script>
+</body>
+</html>

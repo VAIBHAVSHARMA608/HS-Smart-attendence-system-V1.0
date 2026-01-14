@@ -1,0 +1,15 @@
+/* style.css */
+body {
+  overflow-x: hidden;
+}
+
+.content {
+  margin-top: 56px; /* Adjust for navbar height */
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .content {
+    margin-left: 250px; /* Adjust for sidebar width */
+  }
+}

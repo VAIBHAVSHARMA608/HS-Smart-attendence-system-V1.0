@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <button class="btn btn-outline-light d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="MAIN.HTML">HINDU SHIKSHA SAMITI - Teacher</a>
+      <span class="navbar-text text-white ms-auto">Teacher Portal</span>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard.html">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="attendance.html">
+            <i class="bi bi-calendar-check me-2"></i> Mark Attendance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="students.html">
+            <i class="bi bi-people me-2"></i> Students List
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reports.html">
+            <i class="bi bi-file-earmark-text me-2"></i> Reports & Remarks
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="attendance.html">
+          <i class="bi bi-calendar-check me-2"></i> Mark Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="students.html">
+          <i class="bi bi-people me-2"></i> Students List
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="reports.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports & Remarks
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <h2>Class 10A - Students List</h2>
+      <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped align-middle">
+          <thead class="table-primary">
+            <tr>
+              <th>Roll No.</th>
+              <th>Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>Rahul Mehra</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(1, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(1, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(1, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(1, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>Priya Verma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(2, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(2, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(2, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(2, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>Aman Kumar</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(3, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(3, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(3, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(3, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>Sneha Patel</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(4, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(4, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(4, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(4, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td>Tanvi Mishra</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(5, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(5, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(5, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(5, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td>Aditya Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(6, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(6, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(6, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(6, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td>Vikas Joshi</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(7, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(7, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(7, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(7, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td>Megha Jain</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(8, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(8, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(8, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(8, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td>Karan Malhotra</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(9, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(9, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(9, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(9, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td>Shivani Chauhan</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(10, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(10, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(10, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(10, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td>Harsh Vardhan</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(11, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(11, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(11, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(11, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td>Pooja Desai</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(12, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(12, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(12, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(12, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td>Deepak Saini</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(13, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(13, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(13, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(13, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td>Riya Kapoor</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(14, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(14, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(14, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(14, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td>Simran Kaur</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(15, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(15, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(15, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(15, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>16</td>
+              <td>Arjun Yadav</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(16, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(16, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(16, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(16, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>17</td>
+              <td>Neha Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(17, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(17, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(17, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(17, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>18</td>
+              <td>Manish Agarwal</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(18, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(18, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(18, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(18, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>19</td>
+              <td>Rohit Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(19, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(19, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(19, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(19, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>20</td>
+              <td>Anjali Gupta</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(20, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(20, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(20, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(20, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>21</td>
+              <td>Rahul Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(21, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(21, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(21, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(21, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>22</td>
+              <td>Sakshi Jain</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(22, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(22, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(22, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(22, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>23</td>
+              <td>Amit Soni</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(23, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(23, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(23, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(23, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>24</td>
+              <td>Nisha Kumari</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(24, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(24, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(24, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(24, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>25</td>
+              <td>Saurabh Mishra</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(25, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(25, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(25, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(25, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>26</td>
+              <td>Divya Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(26, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(26, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(26, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(26, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>27</td>
+              <td>Akash Gupta</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(27, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(27, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(27, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(27, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>28</td>
+              <td>Priyanka Yadav</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(28, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(28, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(28, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(28, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>29</td>
+              <td>Vivek Kumar</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(29, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(29, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(29, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(29, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>30</td>
+              <td>Ritu Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(30, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(30, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(30, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(30, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>31</td>
+              <td>Sandeep Verma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(31, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(31, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(31, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(31, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>32</td>
+              <td>Kavita Joshi</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(32, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(32, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(32, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(32, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>33</td>
+              <td>Aakash Mehta</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(33, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(33, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(33, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(33, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>34</td>
+              <td>Sneha Sinha</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(34, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(34, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(34, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(34, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>35</td>
+              <td>Gaurav Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(35, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(35, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(35, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(35, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>36</td>
+              <td>Pankaj Kumar</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(36, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(36, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(36, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(36, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>37</td>
+              <td>Jyoti Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(37, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(37, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(37, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(37, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>38</td>
+              <td>Rakesh Yadav</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(38, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(38, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(38, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(38, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>39</td>
+              <td>Sunita Devi</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(39, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(39, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(39, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(39, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>40</td>
+              <td>Vishal Chauhan</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(40, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(40, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(40, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(40, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>41</td>
+              <td>Aarti Gupta</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(41, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(41, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(41, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(41, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>42</td>
+              <td>Nitin Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(42, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(42, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(42, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(42, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>43</td>
+              <td>Shweta Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(43, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(43, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(43, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(43, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>44</td>
+              <td>Rajeev Ranjan</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(44, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(44, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(44, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(44, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>45</td>
+              <td>Komal Agarwal</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(45, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(45, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(45, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(45, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>46</td>
+              <td>Sahil Khan</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(46, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(46, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(46, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(46, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>47</td>
+              <td>Ankita Mehra</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(47, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(47, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(47, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(47, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>48</td>
+              <td>Yash Raj</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(48, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(48, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(48, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(48, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>49</td>
+              <td>Rachna Kumari</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(49, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(49, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(49, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(49, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>50</td>
+              <td>Sumit Saini</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(50, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(50, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(50, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(50, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>51</td>
+              <td>Payal Sharma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(51, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(51, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(51, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(51, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>52</td>
+              <td>Mohit Verma</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(52, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(52, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(52, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(52, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>53</td>
+              <td>Ritika Singh</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(53, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(53, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(53, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(53, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>54</td>
+              <td>Amanpreet Kaur</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(54, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(54, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(54, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(54, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+            <tr>
+              <td>55</td>
+              <td>Siddharth Jain</td>
+              <td>
+                <button class="btn btn-sm btn-info me-1" onclick="showStudentModal(55, 'profile')">Profile</button>
+                <button class="btn btn-sm btn-primary me-1" onclick="showStudentModal(55, 'contact')">Contact</button>
+                <button class="btn btn-sm btn-warning me-1" onclick="showStudentModal(55, 'fees')">Fees</button>
+                <button class="btn btn-sm btn-success" onclick="showStudentModal(55, 'admission')">Admission Status</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Student Info Modal -->
+  <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="studentModalLabel">Student Info</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="studentModalBody">
+          <!-- Info will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const studentsInfo = {
+      1: {
+        name: "Rahul Mehra",
+        profile: "Roll No: 1<br>Name: Rahul Mehra<br>Class: 10A<br>DOB: 2008-01-15<br>Father: Suresh Mehra",
+        contact: "Father: Suresh Mehra<br>Phone: +91-9000000001<br>Email: rahul.mehra@email.com",
+        fees: "Total Fees: ₹30,000<br>Paid: ₹25,000<br>Due: ₹5,000",
+        admission: "Status: <span class='text-success'>Active</span><br>Admission Date: 2020-04-01"
+      },
+      2: {
+        name: "Priya Verma",
+        profile: "Roll No: 2<br>Name: Priya Verma<br>Class: 10A<br>DOB: 2008-02-10<br>Father: Rajesh Verma",
+        contact: "Father: Rajesh Verma<br>Phone: +91-9000000002<br>Email: priya.verma@email.com",
+        fees: "Total Fees: ₹30,000<br>Paid: ₹30,000<br>Due: ₹0",
+        admission: "Status: <span class='text-success'>Active</span><br>Admission Date: 2020-04-01"
+      },
+      // ...repeat for all students up to 55 (add dummy data as needed)...
+    };
+
+    // Fallback for students not in the object
+    function getStudentInfo(roll, type) {
+      if (studentsInfo[roll]) {
+        return studentsInfo[roll][type];
+      }
+      // Default dummy info
+      if (type === "profile") return `Roll No: ${roll}<br>Name: Student ${roll}<br>Class: 10A`;
+      if (type === "contact") return `Phone: +91-90000000${roll.toString().padStart(2, '0')}`;
+      if (type === "fees") return "Total Fees: ₹30,000<br>Paid: ₹28,000<br>Due: ₹2,000";
+      if (type === "admission") return "Status: <span class='text-success'>Active</span><br>Admission Date: 2020-04-01";
+      return "No data available.";
+    }
+
+    function showStudentModal(roll, type) {
+      const modalLabel = document.getElementById('studentModalLabel');
+      const modalBody = document.getElementById('studentModalBody');
+      let title = "";
+      if (type === "profile") title = "Profile";
+      if (type === "contact") title = "Contact Details";
+      if (type === "fees") title = "Fees Details";
+      if (type === "admission") title = "Admission Status";
+      modalLabel.textContent = `${title} - Roll No. ${roll}`;
+      modalBody.innerHTML = getStudentInfo(roll, type);
+      const modal = new bootstrap.Modal(document.getElementById('studentModal'));
+      modal.show();
+    }
+  </script>
+</body>
+</html>

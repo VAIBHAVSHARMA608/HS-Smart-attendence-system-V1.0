@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Attendance Sheet - HR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .progress-circle {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .progress-circle svg {
+      transform: rotate(-90deg);
+    }
+    .progress-circle .progress-value {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: bold;
+    }
+    .mini-meter {
+      width: 70px;
+      height: 70px;
+      position: relative;
+      display: inline-block;
+      margin-right: 18px;
+      margin-bottom: 18px;
+    }
+    .mini-meter svg {
+      transform: rotate(-90deg);
+    }
+    .mini-meter .mini-value {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: bold;
+    }
+    .attendance-table th, .attendance-table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+    .holiday-box {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.1rem;
+      position: absolute;
+      top: 20px;
+      right: 40px;
+      z-index: 10;
+      min-width: 320px;
+    }
+    .rating-star {
+      color: #ffc107;
+      font-size: 1.2rem;
+    }
+    .meters-row {
+      margin-bottom: 30px;
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 18px;
+      justify-content: flex-start;
+    }
+    .badge-class-meter {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+    }
+    @media (max-width: 991px) {
+      .holiday-box {
+        position: static;
+        margin-bottom: 18px;
+        min-width: unset;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <button class="btn btn-outline-light d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="MAIN.html">HINDU SHIKSHA SAMITI - HR</a>
+      <span class="navbar-text text-white ms-auto">HR Portal</span>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard.html">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="attendence.html">
+            <i class="bi bi-calendar-check me-2"></i> Attendance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="employees.html">
+            <i class="bi bi-people me-2"></i> Employees
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="salary.html">
+            <i class="bi bi-cash-stack me-2"></i> Salary
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reports.html">
+            <i class="bi bi-file-earmark-text me-2"></i> Reports
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="attendence.html">
+          <i class="bi bi-calendar-check me-2"></i> Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="employees.html">
+          <i class="bi bi-people me-2"></i> Employees
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="salary.html">
+          <i class="bi bi-cash-stack me-2"></i> Salary
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="reports.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="holiday-box d-none d-lg-flex">
+    <i class="bi bi-calendar-event text-primary fs-4"></i>
+    <span><b>Next Holiday:</b> 15th August (Independence Day)</span>
+  </div>
+
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <div class="d-flex align-items-center mb-3 flex-wrap">
+        <div class="form-check form-switch me-3">
+          <input class="form-check-input" type="checkbox" id="attendanceSwitch" onchange="toggleAttendanceType()">
+          <label class="form-check-label" for="attendanceSwitch" id="attendanceSwitchLabel">Show Students</label>
+        </div>
+        <div id="classDropdownContainer" class="d-none ms-3">
+          <label for="classDropdown" class="me-2"><b>Class:</b></label>
+          <select id="classDropdown" class="form-select form-select-sm" style="width:120px;display:inline-block;" onchange="renderAttendanceTable()">
+            <option value="1">Class 1</option>
+            <option value="2">Class 2</option>
+            <option value="3">Class 3</option>
+            <option value="4">Class 4</option>
+            <option value="5">Class 5</option>
+            <option value="6">Class 6</option>
+            <option value="7">Class 7</option>
+            <option value="8">Class 8</option>
+            <option value="9">Class 9</option>
+            <option value="10">Class 10</option>
+            <option value="11">Class 11</option>
+            <option value="12">Class 12</option>
+          </select>
+        </div>
+        <h2 class="mb-0 ms-3">Attendance Sheet</h2>
+      </div>
+
+      <!-- Class meters row -->
+      <div class="meters-row" id="classMetersRow">
+        <!-- Class meters will be rendered here -->
+      </div>
+
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="mb-4 d-flex align-items-center">
+            <div class="mini-meter" id="teacherMiniMeter">
+              <svg width="70" height="70">
+                <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+                <circle id="teacherMiniProgress" cx="35" cy="35" r="30" stroke="#0d6efd" stroke-width="8" fill="none"
+                  stroke-dasharray="0 188" stroke-linecap="round"/>
+              </svg>
+              <div class="mini-value" id="teacherMiniValue">0%</div>
+            </div>
+            <span style="margin-right: 30px;"><b>Teachers' Attendance</b> (<span id="teacherPresentDays">0</span> / <span id="teacherTotalDays">0</span> days)</span>
+            <div class="mini-meter" id="nonTeachingMiniMeter">
+              <svg width="70" height="70">
+                <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+                <circle id="nonTeachingMiniProgress" cx="35" cy="35" r="30" stroke="#fd7e14" stroke-width="8" fill="none"
+                  stroke-dasharray="0 188" stroke-linecap="round"/>
+              </svg>
+              <div class="mini-value" id="nonTeachingMiniValue">0%</div>
+            </div>
+            <span><b>Non-Teaching Attendance</b></span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered attendance-table">
+              <thead class="table-primary">
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Designation</th>
+                  <th>Status</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <!-- Rows will be filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-4 d-flex flex-column align-items-center">
+          <div class="progress-circle" id="attendanceCircle">
+            <svg width="160" height="160">
+              <circle cx="80" cy="80" r="70" stroke="#e9ecef" stroke-width="16" fill="none"/>
+              <circle id="attendanceProgress" cx="80" cy="80" r="70" stroke="#198754" stroke-width="16" fill="none"
+                stroke-dasharray="0 440" stroke-linecap="round"/>
+            </svg>
+            <div class="progress-value" id="attendanceValue">0%</div>
+            <div class="text-center mt-2"><b>Overall Attendance Health</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container mt-4">
+      <h3>Staff List</h3>
+      <div class="row">
+        <div class="col-md-6">
+          <h5 class="mt-3">Teaching Staff</h5>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mrs. Anjali Sharma
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Anjali Sharma', 'Teacher', 'Jaipur', '+91-9000012345', 'anjali.sharma@school.edu.in', 98, 176, 180, 4.9)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mr. Rajeev Sinha
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Rajeev Sinha', 'Teacher', 'Delhi', '+91-9000012346', 'rajeev.sinha@school.edu.in', 96, 173, 180, 4.7)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mrs. Priya Verma
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Priya Verma', 'Teacher', 'Agra', '+91-9000012347', 'priya.verma@school.edu.in', 94, 170, 180, 4.5)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mr. Amit Kumar
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Amit Kumar', 'Teacher', 'Lucknow', '+91-9000012348', 'amit.kumar@school.edu.in', 92, 166, 180, 4.3)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mrs. Sneha Patel
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Sneha Patel', 'Teacher', 'Kota', '+91-9000012349', 'sneha.patel@school.edu.in', 90, 162, 180, 4.1)">Show More</button>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <h5 class="mt-3">Non-Teaching Staff</h5>
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mr. Suresh Mehra
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Suresh Mehra', 'Non-Teaching', 'Jaipur', '+91-8000012341', 'suresh.mehra@school.edu.in', 95, 171, 180, 4.6)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mrs. Kavita Joshi
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Kavita Joshi', 'Non-Teaching', 'Delhi', '+91-8000012342', 'kavita.joshi@school.edu.in', 93, 167, 180, 4.4)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mr. Deepak Saini
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Deepak Saini', 'Non-Teaching', 'Agra', '+91-8000012343', 'deepak.saini@school.edu.in', 91, 164, 180, 4.2)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mrs. Rachna Kumari
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Rachna Kumari', 'Non-Teaching', 'Lucknow', '+91-8000012344', 'rachna.kumari@school.edu.in', 89, 160, 180, 4.0)">Show More</button>
+            </li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              Mr. Mohit Verma
+              <button class="btn btn-sm btn-outline-info" onclick="showMoreDetails('Mohit Verma', 'Non-Teaching', 'Kota', '+91-8000012345', 'mohit.verma@school.edu.in', 87, 156, 180, 3.8)">Show More</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Details Modal -->
+  <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailsModalLabel">Staff Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="detailsModalBody">
+          <!-- Details will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show More Modal -->
+  <div class="modal fade" id="showMoreModal" tabindex="-1" aria-labelledby="showMoreModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="showMoreModalLabel">Staff Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="showMoreModalBody">
+          <!-- Details will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sample data for 55 teachers and 10 non-teaching staff
+    const teachers = Array.from({length: 55}, (_, i) => ({
+      name: `Teacher ${i+1}`,
+      designation: "Teacher",
+      city: "City " + ((i % 5) + 1),
+      number: "+91-90000" + (10000 + i),
+      gmail: `teacher${i+1}@school.edu.in`,
+      rating: (Math.random() * 2 + 3).toFixed(1), // 3.0 to 5.0
+      attendancePercent: Math.floor(Math.random() * 11) + 90, // 90-100%
+      presentDays: Math.floor(Math.random() * 11) + 170, // 170-180
+      totalDays: 180,
+      status: Math.random() > 0.1 ? "Present" : "Absent"
+    }));
+    const nonTeaching = Array.from({length: 10}, (_, i) => ({
+      name: `Staff ${i+1}`,
+      designation: "Non-Teaching",
+      city: "City " + ((i % 3) + 1),
+      number: "+91-80000" + (10000 + i),
+      gmail: `staff${i+1}@school.edu.in`,
+      rating: (Math.random() * 1.5 + 3).toFixed(1), // 3.0 to 4.5
+      attendancePercent: Math.floor(Math.random() * 16) + 80, // 80-95%
+      presentDays: Math.floor(Math.random() * 16) + 160, // 160-175
+      totalDays: 180,
+      status: Math.random() > 0.2 ? "Present" : "Absent"
+    }));
+
+    // Generate sample students for each class (10 per class)
+    const studentsByClass = {};
+    for (let c = 1; c <= 12; c++) {
+      studentsByClass[c] = Array.from({length: 10}, (_, i) => ({
+        name: `Student ${i+1} (Class ${c})`,
+        class: c,
+        city: "City " + ((i % 4) + 1),
+        number: "+91-70000" + (10000 + i + c*10),
+        gmail: `student${i+1}_c${c}@school.edu.in`,
+        rating: (Math.random() * 2 + 3).toFixed(1),
+        attendancePercent: Math.floor(Math.random() * 11) + 85, // 85-95%
+        presentDays: Math.floor(Math.random() * 11) + 160, // 160-170
+        totalDays: 170,
+        status: Math.random() > 0.1 ? "Present" : "Absent"
+      }));
+    }
+
+    let attendanceType = 'staff'; // 'staff' or 'students'
+
+    function toggleAttendanceType() {
+      const isStudent = document.getElementById('attendanceSwitch').checked;
+      attendanceType = isStudent ? 'students' : 'staff';
+      document.getElementById('attendanceSwitchLabel').textContent = isStudent ? 'Show Staff' : 'Show Students';
+      document.getElementById('classDropdownContainer').classList.toggle('d-none', !isStudent);
+      renderAttendanceTable();
+      renderClassMeters();
+    }
+
+    function renderAttendanceTable() {
+      const tbody = document.getElementById('attendanceTableBody');
+      tbody.innerHTML = '';
+      let presentCount = 0, total = 0, percent = 0;
+      if (attendanceType === 'students') {
+        const selectedClass = document.getElementById('classDropdown').value;
+        const students = studentsByClass[selectedClass];
+        total = students.length;
+        students.forEach((person, idx) => {
+          if(person.status === "Present") presentCount++;
+          tbody.innerHTML += `
+            <tr>
+              <td>${idx+1}</td>
+              <td>${person.name}</td>
+              <td>Class ${person.class}</td>
+              <td>
+                <span class="badge ${person.status === "Present" ? "bg-success" : "bg-danger"}">
+                  ${person.status}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-info" onclick="showDetailsStudent(${idx}, ${selectedClass})">Details</button>
+              </td>
+            </tr>
+          `;
+        });
+        percent = Math.round((presentCount / total) * 100);
+      } else {
+        // Use your existing staff rendering logic
+        let teacherPresent = 0, nonTeachingPresent = 0;
+        teachers.forEach((person, idx) => {
+          if(person.status === "Present") teacherPresent++;
+          tbody.innerHTML += `
+            <tr>
+              <td>${idx+1}</td>
+              <td>${person.name}</td>
+              <td>${person.designation}</td>
+              <td>
+                <span class="badge ${person.status === "Present" ? "bg-success" : "bg-danger"}">
+                  ${person.status}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-info" onclick="showDetails(${idx}, 'teacher')">Details</button>
+              </td>
+            </tr>
+          `;
+        });
+        nonTeaching.forEach((person, idx) => {
+          if(person.status === "Present") nonTeachingPresent++;
+          tbody.innerHTML += `
+            <tr>
+              <td>${teachers.length + idx + 1}</td>
+              <td>${person.name}</td>
+              <td>${person.designation}</td>
+              <td>
+                <span class="badge ${person.status === "Present" ? "bg-success" : "bg-danger"}">
+                  ${person.status}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-outline-info" onclick="showDetails(${idx}, 'nonTeaching')">Details</button>
+              </td>
+            </tr>
+          `;
+        });
+        presentCount = teacherPresent + nonTeachingPresent;
+        total = teachers.length + nonTeaching.length;
+        percent = Math.round((presentCount / total) * 100);
+      }
+      // Update main attendance meter
+      const circle = 2 * Math.PI * 70;
+      const progress = (percent / 100) * circle;
+      document.getElementById('attendanceProgress').setAttribute('stroke-dasharray', `${progress} ${circle}`);
+      document.getElementById('attendanceValue').textContent = percent + "%";
+    }
+
+    // Render class meters as badges for all 12 classes
+    function renderClassMeters() {
+      const row = document.getElementById('classMetersRow');
+      row.innerHTML = '';
+      for (let c = 1; c <= 12; c++) {
+        const students = studentsByClass[c];
+        const present = students.filter(s => s.status === "Present").length;
+        const percent = Math.round((present / students.length) * 100);
+        const circle = 2 * Math.PI * 30;
+        const progress = (percent / 100) * circle;
+        row.innerHTML += `
+          <div class="badge-class-meter">
+            <div class="mini-meter">
+              <svg width="70" height="70">
+                <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+                <circle cx="35" cy="35" r="30" stroke="#0d6efd" stroke-width="8" fill="none"
+                  stroke-dasharray="${progress} ${circle}" stroke-linecap="round"/>
+              </svg>
+              <div class="mini-value">${percent}%</div>
+            </div>
+            <span class="badge bg-primary">Class ${c}</span>
+          </div>
+        `;
+      }
+      // Hide meters if staff is selected
+      row.style.display = (attendanceType === 'students') ? 'flex' : 'none';
+    }
+
+    // Details Modal
+    window.showDetails = function(idx, type) {
+      let person;
+      if(type === 'teacher') person = teachers[idx];
+      else person = nonTeaching[idx];
+      const stars = '★'.repeat(Math.round(person.rating)) + '<span class="text-muted">' + '★'.repeat(5 - Math.round(person.rating)) + '</span>';
+      const meterCircle = 2 * Math.PI * 30;
+      const meterProgress = (person.attendancePercent / 100) * meterCircle;
+      document.getElementById('detailsModalLabel').textContent = `${person.name} - Details`;
+      document.getElementById('detailsModalBody').innerHTML = `
+        <div class="mb-2"><b>Name:</b> ${person.name}</div>
+        <div class="mb-2"><b>Designation:</b> ${person.designation}</div>
+        <div class="mb-2"><b>City:</b> ${person.city}</div>
+        <div class="mb-2"><b>Contact:</b> ${person.number}</div>
+        <div class="mb-2"><b>Email:</b> ${person.gmail}</div>
+        <div class="mb-2 d-flex align-items-center">
+          <div class="mini-meter me-2">
+            <svg width="70" height="70">
+              <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+              <circle cx="35" cy="35" r="30" stroke="#198754" stroke-width="8" fill="none"
+                stroke-dasharray="${meterProgress} ${meterCircle}" stroke-linecap="round"/>
+            </svg>
+            <div class="mini-value">${person.attendancePercent}%</div>
+          </div>
+          <span><b>Attendance %</b></span>
+        </div>
+        <div class="mb-2"><b>Present Days:</b> ${person.presentDays} / ${person.totalDays}</div>
+        <div class="mb-2"><b>Rating:</b> <span class="rating-star">${stars}</span> (${person.rating})</div>
+        <div class="mb-2"><b>Remarks:</b> ${person.attendancePercent > 95 ? "Excellent" : person.attendancePercent > 90 ? "Good" : "Needs Improvement"}</div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+      modal.show();
+    }
+
+    // Show More Modal
+    window.showMoreDetails = function(name, designation, city, number, gmail, attendancePercent, presentDays, totalDays, rating) {
+      const stars = '★'.repeat(Math.round(rating)) + '<span class="text-muted">' + '★'.repeat(5 - Math.round(rating)) + '</span>';
+      const meterCircle = 2 * Math.PI * 30;
+      const meterProgress = (attendancePercent / 100) * meterCircle;
+      document.getElementById('showMoreModalLabel').textContent = `${name} - Details`;
+      document.getElementById('showMoreModalBody').innerHTML = `
+        <div class="mb-2"><b>Name:</b> ${name}</div>
+        <div class="mb-2"><b>Designation:</b> ${designation}</div>
+        <div class="mb-2"><b>City:</b> ${city}</div>
+        <div class="mb-2"><b>Contact:</b> ${number}</div>
+        <div class="mb-2"><b>Email:</b> ${gmail}</div>
+        <div class="mb-2 d-flex align-items-center">
+          <div class="mini-meter me-2">
+            <svg width="70" height="70">
+              <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+              <circle cx="35" cy="35" r="30" stroke="#198754" stroke-width="8" fill="none"
+                stroke-dasharray="${meterProgress} ${meterCircle}" stroke-linecap="round"/>
+            </svg>
+            <div class="mini-value">${attendancePercent}%</div>
+          </div>
+          <span><b>Attendance %</b></span>
+        </div>
+        <div class="mb-2"><b>Present Days:</b> ${presentDays} / ${totalDays}</div>
+        <div class="mb-2"><b>Rating:</b> <span class="rating-star">${stars}</span> (${rating})</div>
+        <div class="mb-2"><b>Remarks:</b> ${attendancePercent > 95 ? "Excellent" : attendancePercent > 90 ? "Good" : "Needs Improvement"}</div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('showMoreModal'));
+      modal.show();
+    }
+
+    // Student details modal
+    function showDetailsStudent(idx, classNum) {
+      const person = studentsByClass[classNum][idx];
+      const stars = '★'.repeat(Math.round(person.rating)) + '<span class="text-muted">' + '★'.repeat(5 - Math.round(person.rating)) + '</span>';
+      const meterCircle = 2 * Math.PI * 30;
+      const meterProgress = (person.attendancePercent / 100) * meterCircle;
+      document.getElementById('detailsModalLabel').textContent = `${person.name} - Details`;
+      document.getElementById('detailsModalBody').innerHTML = `
+        <div class="mb-2"><b>Name:</b> ${person.name}</div>
+        <div class="mb-2"><b>Class:</b> ${person.class}</div>
+        <div class="mb-2"><b>City:</b> ${person.city}</div>
+        <div class="mb-2"><b>Contact:</b> ${person.number}</div>
+        <div class="mb-2"><b>Email:</b> ${person.gmail}</div>
+        <div class="mb-2 d-flex align-items-center">
+          <div class="mini-meter me-2">
+            <svg width="70" height="70">
+              <circle cx="35" cy="35" r="30" stroke="#e9ecef" stroke-width="8" fill="none"/>
+              <circle cx="35" cy="35" r="30" stroke="#198754" stroke-width="8" fill="none"
+                stroke-dasharray="${meterProgress} ${meterCircle}" stroke-linecap="round"/>
+            </svg>
+            <div class="mini-value">${person.attendancePercent}%</div>
+          </div>
+          <span><b>Attendance %</b></span>
+        </div>
+        <div class="mb-2"><b>Present Days:</b> ${person.presentDays} / ${person.totalDays}</div>
+        <div class="mb-2"><b>Rating:</b> <span class="rating-star">${stars}</span> (${person.rating})</div>
+        <div class="mb-2"><b>Remarks:</b> ${person.attendancePercent > 95 ? "Excellent" : person.attendancePercent > 90 ? "Good" : "Needs Improvement"}</div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+      modal.show();
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', function() {
+      renderAttendanceTable();
+      renderClassMeters();
+    });
+  </script>
+</body>
+</html>

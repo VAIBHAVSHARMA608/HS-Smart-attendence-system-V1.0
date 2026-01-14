@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Salary Sheet - HR</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    .salary-circle {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      display: inline-block;
+      margin-bottom: 30px;
+    }
+    .salary-circle svg {
+      transform: rotate(-90deg);
+    }
+    .salary-circle .salary-value {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: bold;
+    }
+    .salary-table th, .salary-table td {
+      vertical-align: middle;
+      text-align: center;
+    }
+    .salary-type-btns {
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+    .summary-box {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 1.1rem;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <button class="btn btn-outline-light d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="MAIN.html">HINDU SHIKSHA SAMITI - HR</a>
+      <span class="navbar-text text-white ms-auto">HR Portal</span>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="MAIN.html">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="attendence.html">
+            <i class="bi bi-calendar-check me-2"></i> Attendance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="employee.html">
+            <i class="bi bi-people me-2"></i> Employees
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="salary.html">
+            <i class="bi bi-cash-stack me-2"></i> Salary
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reports.html">
+            <i class="bi bi-file-earmark-text me-2"></i> Reports
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link" href="MAIN.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="attendence.html">
+          <i class="bi bi-calendar-check me-2"></i> Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="employee.html">
+          <i class="bi bi-people me-2"></i> Employees
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="salary.html">
+          <i class="bi bi-cash-stack me-2"></i> Salary
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="reports.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <div class="summary-box">
+        <div>
+          <b>Total Salary (Teachers):</b> ₹2,75,000<br>
+          <b>Salary Delivered:</b> ₹2,60,000
+        </div>
+        <div>
+          <b>Total Salary (Non-Teaching):</b> ₹80,000<br>
+          <b>Salary Delivered:</b> ₹75,000
+        </div>
+      </div>
+      <div class="salary-type-btns d-flex">
+        <button class="btn btn-primary" id="showTeachersBtn" onclick="showSalaryType('teachers')">Teaching Staff</button>
+        <button class="btn btn-warning" id="showNonTeachingBtn" onclick="showSalaryType('nonTeaching')">Non-Teaching Staff</button>
+      </div>
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="table-responsive">
+            <table class="table table-bordered salary-table">
+              <thead class="table-primary">
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Designation</th>
+                  <th>Salary</th>
+                  <th>Status</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="salaryTableBody">
+                <!-- Rows will be filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-lg-4 d-flex flex-column align-items-center">
+          <div class="salary-circle" id="salaryCircle">
+            <svg width="160" height="160">
+              <circle cx="80" cy="80" r="70" stroke="#e9ecef" stroke-width="16" fill="none"/>
+              <circle id="salaryProgress" cx="80" cy="80" r="70" stroke="#198754" stroke-width="16" fill="none"
+                stroke-dasharray="0 440" stroke-linecap="round"/>
+            </svg>
+            <div class="salary-value" id="salaryValue">0%</div>
+            <div class="text-center mt-2"><b>Salary Delivered</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Details Modal -->
+  <div class="modal fade" id="salaryDetailsModal" tabindex="-1" aria-labelledby="salaryDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="salaryDetailsModalLabel">Salary Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="salaryDetailsModalBody">
+          <!-- Details will be loaded here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Sample data for teachers and non-teaching staff
+    const teachers = Array.from({length: 10}, (_, i) => ({
+      name: `Teacher ${i+1}`,
+      designation: "Teacher",
+      salary: 25000 + i * 1000,
+      status: Math.random() > 0.1 ? "Paid" : "Pending",
+      city: "City " + ((i % 5) + 1),
+      number: "+91-90000" + (10000 + i),
+      gmail: `teacher${i+1}@school.edu.in`,
+      bank: "SBI",
+      account: "XXXXXX" + (1234 + i),
+      ifsc: "SBIN000" + (100 + i)
+    }));
+    const nonTeaching = Array.from({length: 5}, (_, i) => ({
+      name: `Staff ${i+1}`,
+      designation: "Non-Teaching",
+      salary: 15000 + i * 500,
+      status: Math.random() > 0.2 ? "Paid" : "Pending",
+      city: "City " + ((i % 3) + 1),
+      number: "+91-80000" + (10000 + i),
+      gmail: `staff${i+1}@school.edu.in`,
+      bank: "PNB",
+      account: "XXXXXX" + (4321 + i),
+      ifsc: "PUNB000" + (200 + i)
+    }));
+
+    let salaryType = 'teachers'; // 'teachers' or 'nonTeaching'
+
+    function showSalaryType(type) {
+      salaryType = type;
+      document.getElementById('showTeachersBtn').classList.toggle('btn-primary', type === 'teachers');
+      document.getElementById('showTeachersBtn').classList.toggle('btn-outline-primary', type !== 'teachers');
+      document.getElementById('showNonTeachingBtn').classList.toggle('btn-warning', type === 'nonTeaching');
+      document.getElementById('showNonTeachingBtn').classList.toggle('btn-outline-warning', type !== 'nonTeaching');
+      renderSalaryTable();
+    }
+
+    function renderSalaryTable() {
+      const tbody = document.getElementById('salaryTableBody');
+      tbody.innerHTML = '';
+      let total = 0, delivered = 0;
+      let data = salaryType === 'teachers' ? teachers : nonTeaching;
+      data.forEach((person, idx) => {
+        total += person.salary;
+        if(person.status === "Paid") delivered += person.salary;
+        tbody.innerHTML += `
+          <tr>
+            <td>${idx+1}</td>
+            <td>${person.name}</td>
+            <td>${person.designation}</td>
+            <td>₹${person.salary.toLocaleString()}</td>
+            <td>
+              <span class="badge ${person.status === "Paid" ? "bg-success" : "bg-danger"}">
+                ${person.status}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-info" onclick="showSalaryDetails(${idx})">Details</button>
+            </td>
+          </tr>
+        `;
+      });
+      // Update salary meter
+      const percent = Math.round((delivered / total) * 100);
+      const circle = 2 * Math.PI * 70;
+      const progress = (percent / 100) * circle;
+      document.getElementById('salaryProgress').setAttribute('stroke-dasharray', `${progress} ${circle}`);
+      document.getElementById('salaryValue').textContent = percent + "%";
+    }
+
+    function showSalaryDetails(idx) {
+      const data = salaryType === 'teachers' ? teachers : nonTeaching;
+      const person = data[idx];
+      document.getElementById('salaryDetailsModalLabel').textContent = `${person.name} - Salary Details`;
+      document.getElementById('salaryDetailsModalBody').innerHTML = `
+        <div class="mb-2"><b>Name:</b> ${person.name}</div>
+        <div class="mb-2"><b>Designation:</b> ${person.designation}</div>
+        <div class="mb-2"><b>City:</b> ${person.city}</div>
+        <div class="mb-2"><b>Contact:</b> ${person.number}</div>
+        <div class="mb-2"><b>Email:</b> ${person.gmail}</div>
+        <div class="mb-2"><b>Bank:</b> ${person.bank}</div>
+        <div class="mb-2"><b>Account No.:</b> ${person.account}</div>
+        <div class="mb-2"><b>IFSC:</b> ${person.ifsc}</div>
+        <div class="mb-2"><b>Salary:</b> ₹${person.salary.toLocaleString()}</div>
+        <div class="mb-2"><b>Status:</b> <span class="badge ${person.status === "Paid" ? "bg-success" : "bg-danger"}">${person.status}</span></div>
+      `;
+      const modal = new bootstrap.Modal(document.getElementById('salaryDetailsModal'));
+      modal.show();
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', function() {
+      showSalaryType('teachers');
+    });
+  </script>
+</body>
+</html>

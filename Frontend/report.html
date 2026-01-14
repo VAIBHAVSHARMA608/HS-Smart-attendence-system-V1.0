@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HS ATTENDANCE SYSTEM - Reports</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="MAIN.HTML">HINDU SHIKSHA SAMITI</a>
+      <span class="navbar-text text-white ms-auto">Reports</span>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link" href="dashboard.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="STUDENTS.html">
+          <i class="bi bi-person me-2"></i> Profile
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="attendance.html">
+          <i class="bi bi-calendar-check me-2"></i> Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="report.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports
+        </a>
+      </li>
+      <!-- Add links for HR, Teacher, MD dashboards as needed -->
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <h2 class="mb-4">Reports & Actions</h2>
+
+      <!-- Action Buttons -->
+      <div class="mb-4 d-flex flex-wrap gap-3">
+        <a href="#feesSection" class="btn btn-outline-success"><i class="bi bi-cash-coin me-2"></i>Pay Fees</a>
+        <a href="#assignmentSection" class="btn btn-outline-primary"><i class="bi bi-upload me-2"></i>Submit Assignment</a>
+        <a href="#homeworkSection" class="btn btn-outline-warning"><i class="bi bi-pencil-square me-2"></i>Update Daily Homework</a>
+        <a href="#remarksSection" class="btn btn-outline-info"><i class="bi bi-chat-left-dots me-2"></i>Add Remarks</a>
+        <a href="#complaintSection" class="btn btn-outline-danger"><i class="bi bi-exclamation-triangle me-2"></i>Add Complaint</a>
+      </div>
+
+      <!-- Assignments Report -->
+      <div class="card mb-4" id="assignmentSection">
+        <div class="card-header bg-info text-white">
+          <i class="bi bi-journal-text me-2"></i>Assignments Report
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Assignment</th>
+                <th>Subject</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Marks</th>
+                <th>Submit</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Essay on Environment</td>
+                <td>English</td>
+                <td>2025-05-10</td>
+                <td><span class="badge bg-success">Submitted</span></td>
+                <td>18/20</td>
+                <td><button class="btn btn-sm btn-outline-primary" disabled>Submitted</button></td>
+              </tr>
+              <tr>
+                <td>Algebra Worksheet</td>
+                <td>Math</td>
+                <td>2025-05-12</td>
+                <td><span class="badge bg-danger">Pending</span></td>
+                <td>-</td>
+                <td>
+                  <button class="btn btn-sm btn-primary" onclick="alert('Assignment submitted! (Demo)')">Submit</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Science Project</td>
+                <td>Science</td>
+                <td>2025-05-15</td>
+                <td><span class="badge bg-success">Submitted</span></td>
+                <td>20/20</td>
+                <td><button class="btn btn-sm btn-outline-primary" disabled>Submitted</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Test Report -->
+      <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+          <i class="bi bi-clipboard-data me-2"></i>Test Report
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Test</th>
+                <th>Subject</th>
+                <th>Date</th>
+                <th>Marks Obtained</th>
+                <th>Total Marks</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Unit Test 1</td>
+                <td>Math</td>
+                <td>2025-04-20</td>
+                <td>45</td>
+                <td>50</td>
+                <td><span class="badge bg-success">Passed</span></td>
+              </tr>
+              <tr>
+                <td>Unit Test 1</td>
+                <td>Science</td>
+                <td>2025-04-22</td>
+                <td>38</td>
+                <td>50</td>
+                <td><span class="badge bg-success">Passed</span></td>
+              </tr>
+              <tr>
+                <td>Unit Test 1</td>
+                <td>English</td>
+                <td>2025-04-25</td>
+                <td>41</td>
+                <td>50</td>
+                <td><span class="badge bg-success">Passed</span></td>
+              </tr>
+              <tr>
+                <td>Unit Test 1</td>
+                <td>Social Science</td>
+                <td>2025-04-27</td>
+                <td>32</td>
+                <td>50</td>
+                <td><span class="badge bg-danger">Needs Improvement</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Fees Report -->
+      <div class="card mb-4" id="feesSection">
+        <div class="card-header bg-success text-white">
+          <i class="bi bi-cash-coin me-2"></i>Fees Report
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Fee Type</th>
+                <th>Due Date</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Paid On</th>
+                <th>Pay</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Tuition Fee (Q1)</td>
+                <td>2025-04-10</td>
+                <td>₹ 10,000</td>
+                <td><span class="badge bg-success">Paid</span></td>
+                <td>2025-04-05</td>
+                <td><button class="btn btn-sm btn-outline-success" disabled>Paid</button></td>
+              </tr>
+              <tr>
+                <td>Library Fee</td>
+                <td>2025-05-01</td>
+                <td>₹ 500</td>
+                <td><span class="badge bg-danger">Pending</span></td>
+                <td>-</td>
+                <td>
+                  <button class="btn btn-sm btn-success" onclick="alert('Redirecting to payment gateway (Demo)')">Pay Now</button>
+                </td>
+              </tr>
+              <tr>
+                <td>Sports Fee</td>
+                <td>2025-05-15</td>
+                <td>₹ 800</td>
+                <td><span class="badge bg-warning text-dark">Due</span></td>
+                <td>-</td>
+                <td>
+                  <button class="btn btn-sm btn-success" onclick="alert('Redirecting to payment gateway (Demo)')">Pay Now</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Daily Homework Report -->
+      <div class="card mb-4" id="homeworkSection">
+        <div class="card-header bg-secondary text-white">
+          <i class="bi bi-book me-2"></i>Daily Homework Report
+        </div>
+        <div class="card-body">
+          <form class="row g-3 align-items-center mb-3">
+            <div class="col-auto">
+              <label for="homeworkDate" class="col-form-label">Date:</label>
+            </div>
+            <div class="col-auto">
+              <input type="date" id="homeworkDate" class="form-control">
+            </div>
+            <div class="col-auto">
+              <input type="text" id="homeworkText" class="form-control" placeholder="Enter homework details">
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-primary" onclick="alert('Homework updated! (Demo)')">Update</button>
+            </div>
+          </form>
+          <div class="alert alert-info mb-0">
+            Last updated: 2025-05-10 - "Complete Algebra Worksheet"
+          </div>
+        </div>
+      </div>
+
+      <!-- Remarks Section -->
+      <div class="card mb-4" id="remarksSection">
+        <div class="card-header bg-info text-white">
+          <i class="bi bi-chat-left-dots me-2"></i>Add Remarks
+        </div>
+        <div class="card-body">
+          <form class="row g-3 align-items-center mb-3">
+            <div class="col-auto">
+              <input type="text" id="remarkText" class="form-control" placeholder="Enter your remark">
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-info text-white" onclick="alert('Remark submitted! (Demo)')">Submit Remark</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Complaints Section -->
+      <div class="card mb-4" id="complaintSection">
+        <div class="card-header bg-danger text-white">
+          <i class="bi bi-exclamation-triangle me-2"></i>Add Complaint
+        </div>
+        <div class="card-body">
+          <form class="row g-3 align-items-center mb-3">
+            <div class="col-auto">
+              <input type="text" id="complaintText" class="form-control" placeholder="Enter your complaint">
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-danger" onclick="alert('Complaint submitted! (Demo)')">Submit Complaint</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Chat Section -->
+      <div id="chatMessages" style="height:200px;overflow-y:auto;border:1px solid #ccc;margin-bottom:10px;"></div>
+      <input id="chatInput" type="text" placeholder="Type a message">
+      <button onclick="sendChat('md', 'mdmaster', document.getElementById('chatInput').value)">Send</button>
+
+    </div>
+  </main>
+<script>
+  function sendChat(role, name, message) {
+    fetch('http://localhost:4000/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fromRole: role, fromName: name, message: message })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success) {
+        document.getElementById('chatInput').value = '';
+        loadChats();
+      }
+    });
+  }
+
+  function loadChats() {
+    fetch('http://localhost:4000/api/chat')
+      .then(res => res.json())
+      .then(chats => {
+        const chatBox = document.getElementById('chatMessages');
+        chatBox.innerHTML = '';
+        chats.forEach(chat => {
+          chatBox.innerHTML += `<div><b>[${chat.fromRole}] ${chat.fromName}:</b> ${chat.message}</div>`;
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+  }
+
+  // Load chats on page load
+  loadChats();
+</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HS ATTENDANCE SYSTEM</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    // Redirect to login page if not logged in
+    if (!localStorage.getItem('studentLoggedIn')) {
+      window.location.href = "login page.html";
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar navbar-dark bg-primary fixed-top" style="height: 56px;">
+    <div class="container-fluid">
+      <button class="btn btn-outline-light d-md-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" href="MAIN.HTML">HINDU SHIKSHA SAMITI</a>
+      <form class="d-flex align-items-center ms-auto" id="mainSearchForm" role="search" style="max-width: 350px;">
+        <button class="btn btn-sm btn-outline-light me-2" type="button" style="min-width: 120px;">Admission Query</button>
+        <input class="form-control form-control-sm me-2" id="mainSearchInput" type="search" placeholder="Search" aria-label="Search" style="min-width: 100px; max-width: 120px;" autocomplete="off" list="searchOptions">
+        <datalist id="searchOptions">
+          <option value="Dashboard">
+          <option value="Profile">
+          <option value="Attendance">
+          <option value="Reports">
+          <option value="Assignments Report">
+          <option value="Test Report">
+          <option value="Fees Report">
+          <option value="Pay Fees">
+          <option value="Submit Assignment">
+          <option value="Update Daily Homework">
+          <option value="Add Remarks">
+          <option value="Add Complaint">
+          <option value="Classmates">
+          <option value="Toppers">
+          <option value="Events">
+          <option value="Activities">
+        </datalist>
+        <button class="btn btn-sm btn-light" type="submit" style="min-width: 70px;">Submit</button>
+      </form>
+    </div>
+  </nav>
+
+  <!-- Sidebar (Offcanvas) -->
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="sidebarLabel">Menu</h5>
+      <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link active" href="dashboard.html">
+            <i class="bi bi-house-door me-2"></i> Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="STUDENTS.html">
+            <i class="bi bi-person me-2"></i> Profile
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="attendance.html">
+            <i class="bi bi-calendar-check me-2"></i> Attendance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reports.html">
+            <i class="bi bi-file-earmark-text me-2"></i> Reports
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Sidebar (Minimal) -->
+  <div class="d-none d-md-block bg-light sidebar position-fixed" style="width: 220px; top: 56px; left: 0; z-index: 1030; height: calc(100vh - 56px);">
+    <ul class="nav flex-column pt-3">
+      <li class="nav-item">
+        <a class="nav-link active" href="dashboard.html">
+          <i class="bi bi-house-door me-2"></i> Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="STUDENTS.html">
+          <i class="bi bi-person me-2"></i> Profile
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="attendance.html">
+          <i class="bi bi-calendar-check me-2"></i> Attendance
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="reports.html">
+          <i class="bi bi-file-earmark-text me-2"></i> Reports
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <main class="content pt-5" style="margin-left: 220px;">
+    <div class="container mt-4">
+      <!-- Welcome Heading -->
+      <nav class="navbar bg-body-tertiary mb-3">
+        <div class="container-fluid">
+          <span class="navbar-brand mb-0 h1">HI VAIBHAV</span>
+          <button class="btn btn-outline-danger ms-auto" onclick="logout()" type="button">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </div>
+      </nav>
+
+      <!-- Attendance Dashboard Card -->
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="card-title">Attendance Dashboard</h5>
+          <p class="card-text">Overview of attendance for the current week</p>
+        </div>
+        <div class="card-body position-relative">
+          <!-- Attendance Meter at top-right -->
+          <div style="position: absolute; top: 0.75rem; right: 1rem; min-width: 160px; z-index: 1;">
+            <div class="progress" style="height: 20px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: 93%;" aria-valuenow="28" aria-valuemin="0" aria-valuemax="30">
+                28
+              </div>
+              <div class="progress-bar bg-danger" role="progressbar" style="width: 7%;" aria-valuenow="2" aria-valuemin="0" aria-valuemax="30">
+                2
+              </div>
+            </div>
+            <small class="text-muted d-block text-end" style="font-size: 0.85em;">Present / Absent</small>
+          </div>
+          <!-- End Attendance Meter -->
+
+          <!-- Circular Attendance Meter for Week -->
+          <div class="d-flex align-items-center mt-4">
+            <svg width="60" height="60" viewBox="0 0 42 42" class="me-3">
+              <circle cx="21" cy="21" r="18" fill="none" stroke="#e9ecef" stroke-width="4"/>
+              <circle cx="21" cy="21" r="18" fill="none" stroke="#198754" stroke-width="4"
+                stroke-dasharray="25.2 50.4" stroke-dashoffset="0" stroke-linecap="round"/>
+              <text x="21" y="25" text-anchor="middle" font-size="13" fill="#198754" font-weight="bold">5/5</text>
+            </svg>
+            <div>
+              <p class="card-text mb-0 fw-semibold">Your Attendance of Week</p>
+              <small class="text-muted">Present 5 out of 5 days</small>
+            </div>
+          </div>
+          <!-- End Circular Attendance Meter -->
+
+          <h5 class="card-title mt-4">CLASS 1</h5>
+          <p class="card-text">Section A</p>
+          <p class="card-text">Total Students: 30</p>
+          <p class="card-text">Total Present: 28</p>
+          <p class="card-text">Total Absent: 2</p>
+          <a href="#" class="btn btn-primary mt-3">Find more</a>
+        </div>
+      </div>
+
+      <!-- Today's Classwork Card -->
+      <div class="card mb-4" aria-hidden="true">
+        <div class="card-header position-relative">
+          <h5 class="card-title">TODAY'S CLASSWORK</h5>
+          <p class="card-text">Overview of homework for today</p>
+          <p class="card-text"> TOPICS COVERED </p>
+          <p class="card-text"> 1. Introduction to HTML </p>
+          <p class="card-text"> 2. Basic HTML Tags </p>
+          <p class="card-text"> 3. HTML Attributes </p>
+          <p class="card-text"> 4. HTML Forms </p>
+          <p class="card-text"> 5. HTML Links </p>    
+          <h5 class="card-title"> REVISE THESE FOLLOWING TOPICS FOR THE NEXT CLASS </h5>
+          <p class="card-text"> 1. HTML Elements </p>
+          <p class="card-text"> 2. HTML Headings </p>
+          <p class="card-text"> 3. HTML Paragraphs </p>
+          <p class="card-text"> 4. HTML Images </p>
+          <p class="card-text"> 5. HTML Lists </p>
+          <a href="#" class="btn btn-primary">Find more</a>
+
+          <!-- Faculty Endorsement Badges -->
+          <div style="position: absolute; top: 1rem; right: 1rem; min-width: 320px;">
+            <h6 class="text-end mb-2 fw-bold">Your Faculty</h6>
+            <div class="d-flex justify-content-end gap-3 mb-4">
+              <div class="text-center">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" class="rounded-circle border border-2" width="56" height="56" alt="Mr. Sharma">
+                <div style="font-size: 0.95em;">Mr. Sharma</div>
+              </div>
+              <div class="text-center">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="rounded-circle border border-2" width="56" height="56" alt="Ms. Verma">
+                <div style="font-size: 0.95em;">Ms. Verma</div>
+              </div>
+              <div class="text-center">
+                <img src="https://randomuser.me/api/portraits/men/65.jpg" class="rounded-circle border border-2" width="56" height="56" alt="Dr. Singh">
+                <div style="font-size: 0.95em;">Dr. Singh</div>
+              </div>
+              <div class="text-center">
+                <img src="https://randomuser.me/api/portraits/women/68.jpg" class="rounded-circle border border-2" width="56" height="56" alt="Mrs. Gupta">
+                <div style="font-size: 0.95em;">Mrs. Gupta</div>
+              </div>
+              <div class="text-center">
+                <img src="https://randomuser.me/api/portraits/men/12.jpg" class="rounded-circle border border-2" width="56" height="56" alt="Mr. Mehra">
+                <div style="font-size: 0.95em;">Mr. Mehra</div>
+              </div>
+            </div>
+            <!-- Syllabus Progress Circular Meter -->
+            <div class="d-flex flex-column align-items-center mt-4">
+              <h6 class="fw-bold mb-3">Syllabus Progress</h6>
+              <svg width="160" height="160" viewBox="0 0 160 160">
+                <circle cx="80" cy="80" r="70" fill="none" stroke="#e9ecef" stroke-width="14"/>
+                <circle cx="80" cy="80" r="70" fill="none" stroke="#0d6efd" stroke-width="14"
+                  stroke-dasharray="307.9 439.8" stroke-dashoffset="0" stroke-linecap="round"/>
+                <text x="80" y="92" text-anchor="middle" font-size="38" fill="#0d6efd" font-weight="bold">70%</text>
+              </svg>
+            </div>
+            <!-- End Syllabus Progress Circular Meter -->
+          </div>
+          <!-- End Faculty Endorsement Badges -->
+        </div>
+        <div class="card-body"></div>
+      </div>
+
+      <!-- Menu Help Section -->
+      <div class="alert alert-info">
+        <strong>How to use the menu:</strong>
+        <ul class="mb-0">
+          <li><b>Dashboard:</b> View your overall attendance and classwork summary.</li>
+          <li><b>Profile:</b> See and edit your personal and guardian details.</li>
+          <li><b>Attendance:</b> Check your attendance stats, search by day, and view monthly graphs.</li>
+          <li><b>Reports:</b> Access assignments, test results, fees, submit assignments, pay fees, and more.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // filepath: c:\Users\HP\Documents\HS Smart attendence system\Frontend\dashboard.html
+    document.getElementById('mainSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const val = document.getElementById('mainSearchInput').value.trim().toLowerCase();
+
+      // Map search keywords to hrefs (add more as needed)
+      const searchMap = {
+        "dashboard": "dashboard.html",
+        "profile": "STUDENTS.html",
+        "attendance": "attendance.html",
+        "reports": "reports.html",
+        "assignments report": "reports.html#assignmentSection",
+        "test report": "reports.html#testSection",
+        "fees report": "reports.html#feesSection",
+        "pay fees": "reports.html#feesSection",
+        "submit assignment": "reports.html#assignmentSection",
+        "update daily homework": "reports.html#homeworkSection",
+        "add remarks": "reports.html#remarksSection",
+        "add complaint": "reports.html#complaintSection",
+        "classmates": "STUDENTS.html#classmates",
+        "toppers": "MAIN.HTML#toppers",
+        "events": "MAIN.HTML#eventsCarousel",
+        "activities": "MAIN.HTML#eventsCarousel"
+      };
+
+      // Open in a new tab if found
+      if (searchMap[val]) {
+        window.open(searchMap[val], '_blank');
+      } else {
+        alert("No matching option found. Please try: Dashboard, Profile, Attendance, Reports, Assignments Report, Test Report, Fees Report, Pay Fees, Submit Assignment, Update Daily Homework, Add Remarks, Add Complaint, Classmates, Toppers, Events, Activities.");
+      }
+    });
+
+  
+
+</body>
+</html>
