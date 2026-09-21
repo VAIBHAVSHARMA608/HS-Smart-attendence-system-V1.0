@@ -1,0 +1,19 @@
+{
+  "name": "hs-smart-attendance-system",
+  "version": "1.1.0",
+  "private": true,
+  "description": "HS Smart Attendance System — student/teacher/HR/MD portals with an Express + MongoDB API, deployable to Vercel.",
+  "scripts": {
+    "start": "node Backend/server.js",
+    "dev": "node Backend/server.js",
+    "seed": "node Backend/addUsers.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.14.3",
+    "serverless-http": "^3.2.0"
+  }
+}

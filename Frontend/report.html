@@ -282,7 +282,7 @@
   </main>
 <script>
   function sendChat(role, name, message) {
-    fetch('http://localhost:4000/api/chat', {
+    fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fromRole: role, fromName: name, message: message })
@@ -297,7 +297,7 @@
   }
 
   function loadChats() {
-    fetch('http://localhost:4000/api/chat')
+    fetch('/api/chat')
       .then(res => res.json())
       .then(chats => {
         const chatBox = document.getElementById('chatMessages');
