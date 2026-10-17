@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const user = Auth.requireAuth();
+  const root = renderShell('dashboard', 'Dashboard');
+
+  function statTone(tone) { return tone ? ` ${tone}` : ''; }
+
+  async function load() {
+    root.innerHTML = '<p>Loading…</p>';
+    try {
+      const data = await api('/api/dashboard/stats');
+
+      const statsHtml = data.stats.map((s) => `
+        <div class="stat">
+          <div class="num${statTone(s.tone)}">${s.value}</div>
+          <div class="label">${s.label}</div>
+        </div>`).join('');
+
+      const payrollLine = data.payrollThisMonth != null
+        ? `<div class="stat"><div class="num">₹${Number(data.payrollThisMonth).toLocaleString('en-IN')}</div><div class="label">Payroll this month</div></div>`
+        : '';
+
+      const annHtml = data.announcements.length
+        ? data.announcements.map((a) => `
+            <div style="padding:12px 0;border-bottom:1px solid var(--line);">
+              <strong style="font-size:0.9rem;">${a.title}</strong>
+              <p style="margin:4px 0 2px;font-size:0.85rem;">${a.message}</p>
+              <span style="font-size:0.74rem;color:var(--ink-faint);">${a.postedBy} · ${formatDate(a.createdAt)}</span>
+            </div>`).join('')
+        : '<div class="empty-state"><h3>No notices yet</h3><p>Announcements will appear here.</p></div>';
+
+      root.innerHTML = `
+        <div class="stat-strip">${statsHtml}${payrollLine}</div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h2>Attendance breakdown</h2></div>
+            <canvas id="attChart" height="200"></canvas>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Latest notices</h2></div>
+            ${annHtml}
+          </div>
+        </div>
+      `;
+
+      const summary = await api('/api/attendance/summary');
+      new Chart(document.getElementById('attChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent', 'Leave', 'Half day'],
+          datasets: [{
+            data: [summary.present, summary.absent, summary.leave, summary['half-day']],
+            backgroundColor: ['#557a63', '#a8432f', '#b9842c', '#9aa6a3'],
+            borderWidth: 0,
+          }],
+        },
+        options: {
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'IBM Plex Sans', size: 11 } } } },
+          cutout: '62%',
+        },
+      });
+    } catch (err) {
+      root.innerHTML = `<div class="empty-state"><h3>Couldn't load dashboard</h3><p>${err.message}</p></div>`;
+    }
+  }
+  load();
+</script>
+</body>
+</html>

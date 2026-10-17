@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>People · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script>
+  const user = Auth.requireAuth(['teacher', 'hr', 'md']);
+  const root = renderShell('people', 'People');
+  const canManage = ['hr', 'md'].includes(user.role);
+  let tab = 'students';
+
+  function layout() {
+    root.innerHTML = `
+      ${canManage ? `
+        <div class="role-tabs" style="max-width:280px;grid-template-columns:1fr 1fr;">
+          <div class="role-tab ${tab === 'students' ? 'active' : ''}" data-tab="students">Students</div>
+          <div class="role-tab ${tab === 'staff' ? 'active' : ''}" data-tab="staff">Staff</div>
+        </div>` : ''}
+      <div id="panelHost"></div>`;
+    if (canManage) {
+      root.querySelectorAll('.role-tab').forEach((t) => t.addEventListener('click', () => { tab = t.dataset.tab; layout(); render(); }));
+    }
+  }
+
+  async function render() {
+    const host = document.getElementById('panelHost');
+    host.innerHTML = '<p>Loading…</p>';
+    if (tab === 'students' || user.role === 'teacher') await renderStudents(host);
+    else await renderStaff(host);
+  }
+
+  async function renderStudents(host) {
+    const students = await api('/api/students');
+    host.innerHTML = `
+      <div class="panel">
+        <div class="panel-head">
+          <h2>${user.role === 'teacher' ? 'Student roster' : 'Students'}</h2>
+          ${canManage ? '<button class="btn btn-primary" id="addBtn">+ Add student</button>' : ''}
+        </div>
+        <div id="formHost"></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Class</th><th>Guardian</th><th>Phone</th><th>Status</th>${canManage ? '<th></th>' : ''}</tr></thead>
+          <tbody>
+            ${students.length ? students.map((s) => `
+              <tr data-id="${s._id}">
+                <td>${s.name}</td><td>${s.className} · ${s.section}</td><td>${s.guardianName || '—'}</td><td>${s.guardianPhone || '—'}</td>
+                <td><span class="pill pill-${s.status}">${s.status}</span></td>
+                ${canManage ? `<td><button class="btn btn-ghost editBtn">Edit</button><button class="btn btn-ghost delBtn" style="color:var(--clay);">Delete</button></td>` : ''}
+              </tr>`).join('') : `<tr><td colspan="6"><div class="empty-state"><h3>No students yet</h3></div></td></tr>`}
+          </tbody>
+        </table></div>
+      </div>`;
+
+    if (canManage) {
+      document.getElementById('addBtn').addEventListener('click', () => showStudentForm());
+      host.querySelectorAll('.editBtn').forEach((b) => b.addEventListener('click', (e) => {
+        const id = e.target.closest('tr').dataset.id;
+        const s = students.find((x) => x._id === id);
+        showStudentForm(s);
+      }));
+      host.querySelectorAll('.delBtn').forEach((b) => b.addEventListener('click', async (e) => {
+        if (!confirm('Remove this student?')) return;
+        const id = e.target.closest('tr').dataset.id;
+        try { await api(`/api/students/${id}`, { method: 'DELETE' }); toast('Student removed'); render(); }
+        catch (err) { toast(err.message, 'error'); }
+      }));
+    }
+  }
+
+  function showStudentForm(s) {
+    const formHost = document.getElementById('formHost');
+    formHost.innerHTML = `
+      <div class="panel" style="background:var(--paper);">
+        <h3>${s ? 'Edit student' : 'Add student'}</h3>
+        <div class="field-row">
+          ${s ? '' : '<div><label>Student ID</label><input id="f_id" placeholder="student127" /></div>'}
+          <div><label>Full name</label><input id="f_name" value="${s ? s.name : ''}" /></div>
+          <div><label>Class</label><input id="f_class" value="${s ? s.className : ''}" placeholder="Grade 10" /></div>
+          <div><label>Section</label><input id="f_section" value="${s ? s.section : 'A'}" /></div>
+        </div>
+        <div class="field-row">
+          <div><label>Guardian name</label><input id="f_guardian" value="${s ? s.guardianName || '' : ''}" /></div>
+          <div><label>Guardian phone</label><input id="f_phone" value="${s ? s.guardianPhone || '' : ''}" /></div>
+          ${s ? '' : '<div><label>Password</label><input id="f_password" type="password" placeholder="Login password" /></div>'}
+        </div>
+        <button class="btn btn-primary" id="submitStudent">${s ? 'Save changes' : 'Add student'}</button>
+        <button class="btn btn-ghost" id="cancelStudent">Cancel</button>
+      </div>`;
+    document.getElementById('cancelStudent').addEventListener('click', () => { formHost.innerHTML = ''; });
+    document.getElementById('submitStudent').addEventListener('click', async () => {
+      const payload = {
+        name: document.getElementById('f_name').value.trim(),
+        className: document.getElementById('f_class').value.trim(),
+        section: document.getElementById('f_section').value.trim(),
+        guardianName: document.getElementById('f_guardian').value.trim(),
+        guardianPhone: document.getElementById('f_phone').value.trim(),
+      };
+      try {
+        if (s) {
+          await api(`/api/students/${s._id}`, { method: 'PUT', body: JSON.stringify(payload) });
+          toast('Student updated');
+        } else {
+          payload.studentId = document.getElementById('f_id').value.trim();
+          payload.password = document.getElementById('f_password').value;
+          await api('/api/students', { method: 'POST', body: JSON.stringify(payload) });
+          toast('Student added');
+        }
+        render();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  }
+
+  async function renderStaff(host) {
+    const staff = await api('/api/employees');
+    host.innerHTML = `
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Staff directory</h2>
+          <button class="btn btn-primary" id="addBtn">+ Add staff</button>
+        </div>
+        <div id="formHost"></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Role</th><th>Department</th><th>Designation</th><th class="num">Base salary</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            ${staff.length ? staff.map((e) => `
+              <tr data-id="${e._id}">
+                <td>${e.name}</td><td style="text-transform:capitalize;">${e.role}</td><td>${e.department || '—'}</td><td>${e.designation || '—'}</td>
+                <td class="num">₹${Number(e.baseSalary || 0).toLocaleString('en-IN')}</td>
+                <td><span class="pill pill-${e.status}">${e.status}</span></td>
+                <td><button class="btn btn-ghost editBtn">Edit</button><button class="btn btn-ghost delBtn" style="color:var(--clay);">Delete</button></td>
+              </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state"><h3>No staff yet</h3></div></td></tr>`}
+          </tbody>
+        </table></div>
+      </div>`;
+
+    document.getElementById('addBtn').addEventListener('click', () => showStaffForm());
+    host.querySelectorAll('.editBtn').forEach((b) => b.addEventListener('click', (e) => {
+      const id = e.target.closest('tr').dataset.id;
+      showStaffForm(staff.find((x) => x._id === id));
+    }));
+    host.querySelectorAll('.delBtn').forEach((b) => b.addEventListener('click', async (e) => {
+      if (!confirm('Remove this staff member?')) return;
+      const id = e.target.closest('tr').dataset.id;
+      try { await api(`/api/employees/${id}`, { method: 'DELETE' }); toast('Staff removed'); render(); }
+      catch (err) { toast(err.message, 'error'); }
+    }));
+  }
+
+  function showStaffForm(e) {
+    const formHost = document.getElementById('formHost');
+    formHost.innerHTML = `
+      <div class="panel" style="background:var(--paper);">
+        <h3>${e ? 'Edit staff member' : 'Add staff member'}</h3>
+        <div class="field-row">
+          ${e ? '' : '<div><label>Employee ID</label><input id="f_id" placeholder="teacher03" /></div>'}
+          <div><label>Full name</label><input id="f_name" value="${e ? e.name : ''}" /></div>
+          ${e ? '' : `<div><label>Role</label><select id="f_role"><option value="teacher">Teacher</option><option value="hr">HR</option><option value="md">MD</option></select></div>`}
+          <div><label>Department</label><input id="f_dept" value="${e ? e.department || '' : ''}" placeholder="Grade 10" /></div>
+        </div>
+        <div class="field-row">
+          <div><label>Designation</label><input id="f_desig" value="${e ? e.designation || '' : ''}" /></div>
+          <div><label>Base salary (₹/mo)</label><input id="f_salary" type="number" value="${e ? e.baseSalary : ''}" /></div>
+          ${e ? '' : '<div><label>Password</label><input id="f_password" type="password" placeholder="Login password" /></div>'}
+        </div>
+        <button class="btn btn-primary" id="submitStaff">${e ? 'Save changes' : 'Add staff member'}</button>
+        <button class="btn btn-ghost" id="cancelStaff">Cancel</button>
+      </div>`;
+    document.getElementById('cancelStaff').addEventListener('click', () => { formHost.innerHTML = ''; });
+    document.getElementById('submitStaff').addEventListener('click', async () => {
+      const payload = {
+        name: document.getElementById('f_name').value.trim(),
+        department: document.getElementById('f_dept').value.trim(),
+        designation: document.getElementById('f_desig').value.trim(),
+        baseSalary: Number(document.getElementById('f_salary').value || 0),
+      };
+      try {
+        if (e) {
+          await api(`/api/employees/${e._id}`, { method: 'PUT', body: JSON.stringify(payload) });
+          toast('Staff member updated');
+        } else {
+          payload.employeeId = document.getElementById('f_id').value.trim();
+          payload.role = document.getElementById('f_role').value;
+          payload.password = document.getElementById('f_password').value;
+          await api('/api/employees', { method: 'POST', body: JSON.stringify(payload) });
+          toast('Staff member added');
+        }
+        render();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  }
+
+  layout();
+  render().catch((err) => {
+    document.getElementById('panelHost').innerHTML = `<div class="empty-state"><h3>Couldn't load</h3><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

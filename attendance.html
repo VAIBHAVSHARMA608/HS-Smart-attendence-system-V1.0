@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Attendance · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script>
+  const user = Auth.requireAuth();
+  const root = renderShell('attendance', 'Attendance');
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  function pill(status) {
+    return `<span class="pill pill-${status}">${status.replace('-', ' ')}</span>`;
+  }
+
+  async function renderStudentView() {
+    root.innerHTML = '<p>Loading…</p>';
+    const records = await api('/api/attendance');
+    const present = records.filter((r) => r.status === 'present').length;
+    const rate = records.length ? Math.round((present / records.length) * 100) : 0;
+    root.innerHTML = `
+      <div class="stat-strip">
+        <div class="stat"><div class="num ${rate >= 75 ? 'sage' : 'clay'}">${rate}%</div><div class="label">Overall attendance</div></div>
+        <div class="stat"><div class="num">${records.length}</div><div class="label">Days recorded</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>My attendance</h2></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date</th><th>Status</th><th>Marked by</th></tr></thead>
+          <tbody>
+            ${records.length ? records.map((r) => `<tr><td>${formatDate(r.date)}</td><td>${pill(r.status)}</td><td>${r.markedBy || '—'}</td></tr>`).join('')
+              : '<tr><td colspan="3"><div class="empty-state">No attendance recorded yet</div></td></tr>'}
+          </tbody>
+        </table></div>
+      </div>`;
+  }
+
+  async function renderMarkingView() {
+    const isTeacher = user.role === 'teacher';
+    root.innerHTML = `
+      <div class="panel">
+        <div class="panel-head"><h2>Mark attendance</h2></div>
+        <div class="field-row">
+          <div><label>Date</label><input type="date" id="dateInput" value="${todayStr}" max="${todayStr}" /></div>
+          ${isTeacher ? '' : `<div><label>Mark for</label><select id="typeInput"><option value="Student">Students</option><option value="Employee">Staff</option></select></div>`}
+          <div><label>Group</label><select id="groupInput"></select></div>
+        </div>
+        <div id="rosterBox"><p>Choose a date and group to load the roster.</p></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><h2>Recent records</h2></div>
+        <div id="recentBox"><p>Loading…</p></div>
+      </div>`;
+
+    const dateInput = document.getElementById('dateInput');
+    const typeInput = document.getElementById('typeInput');
+    const groupInput = document.getElementById('groupInput');
+    const rosterBox = document.getElementById('rosterBox');
+
+    async function loadGroups() {
+      const personType = isTeacher ? 'Student' : (typeInput.value || 'Student');
+      if (personType === 'Student') {
+        const students = await api('/api/students');
+        const groups = [...new Set(students.map((s) => s.className))];
+        groupInput.innerHTML = groups.map((g) => `<option value="${g}">${g}</option>`).join('') || '<option value="">No classes yet</option>';
+      } else {
+        const employees = await api('/api/employees?role=teacher');
+        const groups = [...new Set(employees.map((e) => e.department).filter(Boolean))];
+        groupInput.innerHTML = (groups.length ? groups : ['General']).map((g) => `<option value="${g}">${g}</option>`).join('');
+      }
+      await loadRoster();
+    }
+
+    async function loadRoster() {
+      const personType = isTeacher ? 'Student' : (typeInput.value || 'Student');
+      const group = groupInput.value;
+      rosterBox.innerHTML = '<p>Loading roster…</p>';
+
+      const list = personType === 'Student'
+        ? await api(`/api/students?className=${encodeURIComponent(group)}`)
+        : (await api('/api/employees')).filter((e) => e.department === group);
+
+      if (!list.length) {
+        rosterBox.innerHTML = '<div class="empty-state"><h3>No one in this group yet</h3><p>Add people from the People page first.</p></div>';
+        return;
+      }
+
+      const existing = await api(`/api/attendance?date=${dateInput.value}&personType=${personType}&group=${encodeURIComponent(group)}`);
+      const existingMap = Object.fromEntries(existing.map((r) => [r.person, r.status]));
+
+      rosterBox.innerHTML = `
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Status</th></tr></thead>
+          <tbody>
+            ${list.map((p) => `
+              <tr data-id="${p._id}" data-label="${p.name}">
+                <td>${p.name}</td>
+                <td>
+                  <select class="statusSelect" style="margin:0;max-width:160px;">
+                    ${['present', 'absent', 'leave', 'half-day'].map((s) => `<option value="${s}" ${existingMap[p._id] === s ? 'selected' : (!existingMap[p._id] && s === 'present' ? 'selected' : '')}>${s.replace('-', ' ')}</option>`).join('')}
+                  </select>
+                </td>
+              </tr>`).join('')}
+          </tbody>
+        </table></div>
+        <button class="btn btn-primary" id="saveAttendance" style="margin-top:14px;">Save attendance</button>`;
+
+      document.getElementById('saveAttendance').addEventListener('click', async () => {
+        const rows = rosterBox.querySelectorAll('tbody tr');
+        const records = [...rows].map((r) => ({
+          person: r.dataset.id,
+          personLabel: r.dataset.label,
+          group,
+          status: r.querySelector('.statusSelect').value,
+        }));
+        try {
+          await api('/api/attendance/mark', { method: 'POST', body: JSON.stringify({ date: dateInput.value, personType, records }) });
+          toast('Attendance saved');
+          loadRecent();
+        } catch (err) { toast(err.message, 'error'); }
+      });
+    }
+
+    async function loadRecent() {
+      const recentBox = document.getElementById('recentBox');
+      const records = await api('/api/attendance');
+      recentBox.innerHTML = records.length ? `
+        <div class="table-wrap"><table>
+          <thead><tr><th>Date</th><th>Name</th><th>Group</th><th>Status</th></tr></thead>
+          <tbody>${records.slice(0, 15).map((r) => `<tr><td>${formatDate(r.date)}</td><td>${r.personLabel}</td><td>${r.group || '—'}</td><td>${pill(r.status)}</td></tr>`).join('')}</tbody>
+        </table></div>` : '<div class="empty-state">No attendance marked yet</div>';
+    }
+
+    dateInput.addEventListener('change', loadRoster);
+    if (typeInput) typeInput.addEventListener('change', loadGroups);
+    groupInput.addEventListener('change', loadRoster);
+    loadGroups();
+    loadRecent();
+  }
+
+  (user.role === 'student' ? renderStudentView : renderMarkingView)().catch((err) => {
+    root.innerHTML = `<div class="empty-state"><h3>Couldn't load attendance</h3><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

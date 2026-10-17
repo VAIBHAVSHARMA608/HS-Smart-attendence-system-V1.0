@@ -1,11 +1,85 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="refresh" content="0; url=/Frontend/login%20page.html">
-    <title>HS Smart Attendance System</title>
-  </head>
-  <body>
-    <p><a href="/Frontend/login%20page.html">Open the login page</a></p>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>HS ERP — Sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+  <div class="login-shell">
+    <div class="login-card">
+      <div style="margin-bottom:24px;">
+        <div class="serif" style="font-size:1.5rem;color:var(--teal);">HS ERP</div>
+        <p style="margin-top:2px;">Sign in to your campus suite</p>
+      </div>
+
+      <div class="role-tabs" id="roleTabs">
+        <div class="role-tab active" data-role="student">Student</div>
+        <div class="role-tab" data-role="teacher">Teacher</div>
+        <div class="role-tab" data-role="hr">HR</div>
+        <div class="role-tab" data-role="md">MD</div>
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <form id="loginForm">
+        <label for="username">Username</label>
+        <input id="username" autocomplete="username" required />
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" required />
+        <button class="btn btn-primary" type="submit" style="width:100%;justify-content:center;margin-top:4px;" id="submitBtn">Sign in</button>
+      </form>
+
+      <p style="margin-top:18px;font-size:0.78rem;color:var(--ink-faint);">
+        Demo logins — student123 / password · teacher01 / teach@123 · hradmin / hr@123 · mdmaster / md@2024
+      </p>
+    </div>
+  </div>
+
+  <script src="/assets/js/api.js"></script>
+  <script>
+    let selectedRole = 'student';
+    document.querySelectorAll('.role-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.role-tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        selectedRole = tab.dataset.role;
+      });
+    });
+
+    // Already signed in? skip the form.
+    if (Auth.user() && Auth.token()) window.location.href = '/dashboard.html';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('loginError');
+      const btn = document.getElementById('submitBtn');
+      errBox.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Signing in…';
+      try {
+        const body = JSON.stringify({
+          username: document.getElementById('username').value.trim(),
+          password: document.getElementById('password').value,
+          role: selectedRole,
+        });
+        const res = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || 'Login failed');
+        Auth.save(data.token, data.user);
+        window.location.href = '/dashboard.html';
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Sign in';
+      }
+    });
+  </script>
+</body>
 </html>

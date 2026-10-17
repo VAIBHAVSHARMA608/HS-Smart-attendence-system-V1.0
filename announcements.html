@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Announcements · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script>
+  const user = Auth.requireAuth();
+  const root = renderShell('announcements', 'Announcements');
+  const canPost = ['teacher', 'hr', 'md'].includes(user.role);
+  const AUDIENCES = ['all', 'student', 'teacher', 'hr', 'md'];
+
+  async function render() {
+    root.innerHTML = '<p>Loading…</p>';
+    const items = await api('/api/announcements');
+
+    root.innerHTML = `
+      ${canPost ? `
+        <div class="panel">
+          <h2>Post a notice</h2>
+          <label>Title</label><input id="f_title" placeholder="e.g. Half-day on Friday" />
+          <label>Message</label><textarea id="f_message" rows="3" placeholder="Details for everyone to see…"></textarea>
+          <label>Audience</label>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+            ${AUDIENCES.map((a) => `<label style="display:flex;align-items:center;gap:6px;font-weight:400;text-transform:capitalize;margin:0;"><input type="checkbox" value="${a}" class="audChk" style="width:auto;margin:0;" ${a === 'all' ? 'checked' : ''}/> ${a}</label>`).join('')}
+          </div>
+          <button class="btn btn-primary" id="postBtn">Post notice</button>
+        </div>` : ''}
+      <div class="panel">
+        <div class="panel-head"><h2>Notice board</h2></div>
+        ${items.length ? items.map((a) => `
+          <div style="padding:14px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;">
+            <div>
+              <strong>${a.title}</strong>
+              <p style="margin:4px 0 2px;">${a.message}</p>
+              <span style="font-size:0.74rem;color:var(--ink-faint);">${a.postedBy} (${a.postedByRole}) · ${formatDate(a.createdAt)} · for ${a.audience.join(', ')}</span>
+            </div>
+            <button class="btn btn-ghost delBtn" data-id="${a._id}" style="color:var(--clay);flex-shrink:0;">Delete</button>
+          </div>`).join('') : '<div class="empty-state"><h3>No notices yet</h3></div>'}
+      </div>`;
+
+    if (canPost) {
+      document.getElementById('postBtn').addEventListener('click', async () => {
+        const audience = [...document.querySelectorAll('.audChk:checked')].map((c) => c.value);
+        const payload = {
+          title: document.getElementById('f_title').value.trim(),
+          message: document.getElementById('f_message').value.trim(),
+          audience: audience.length ? audience : ['all'],
+        };
+        try {
+          await api('/api/announcements', { method: 'POST', body: JSON.stringify(payload) });
+          toast('Notice posted');
+          render();
+        } catch (err) { toast(err.message, 'error'); }
+      });
+    }
+    root.querySelectorAll('.delBtn').forEach((b) => b.addEventListener('click', async () => {
+      if (!confirm('Delete this notice?')) return;
+      try { await api(`/api/announcements/${b.dataset.id}`, { method: 'DELETE' }); toast('Notice removed'); render(); }
+      catch (err) { toast(err.message, 'error'); }
+    }));
+  }
+
+  render().catch((err) => {
+    root.innerHTML = `<div class="empty-state"><h3>Couldn't load notices</h3><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

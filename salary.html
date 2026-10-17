@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Salary · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script>
+  const user = Auth.requireAuth(['teacher', 'hr', 'md']);
+  const root = renderShell('salary', 'Salary');
+  const canManage = ['hr', 'md'].includes(user.role);
+  const now = new Date();
+
+  function pill(status) { return `<span class="pill pill-${status}">${status}</span>`; }
+
+  async function render() {
+    root.innerHTML = '<p>Loading…</p>';
+    const records = await api(`/api/salary?month=${now.getMonth() + 1}&year=${now.getFullYear()}`);
+    const total = records.reduce((s, r) => s + r.netPay, 0);
+    const paid = records.filter((r) => r.status === 'paid').length;
+
+    root.innerHTML = `
+      <div class="stat-strip">
+        <div class="stat"><div class="num">₹${total.toLocaleString('en-IN')}</div><div class="label">Total this month</div></div>
+        <div class="stat"><div class="num sage">${paid}</div><div class="label">Paid</div></div>
+        <div class="stat"><div class="num ${records.length - paid ? 'clay' : 'sage'}">${records.length - paid}</div><div class="label">Pending</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Payroll · ${now.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}</h2>
+          ${canManage ? '<button class="btn btn-primary" id="addBtn">+ Generate payslip</button>' : ''}
+        </div>
+        <div id="formHost"></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Employee</th><th class="num">Base</th><th class="num">Bonus</th><th class="num">Deductions</th><th class="num">Net pay</th><th>Status</th>${canManage ? '<th></th>' : ''}</tr></thead>
+          <tbody>
+            ${records.length ? records.map((r) => `
+              <tr data-id="${r._id}">
+                <td>${r.employeeLabel}</td>
+                <td class="num">₹${r.baseSalary.toLocaleString('en-IN')}</td>
+                <td class="num">₹${r.bonus.toLocaleString('en-IN')}</td>
+                <td class="num">₹${r.deductions.toLocaleString('en-IN')}</td>
+                <td class="num"><strong>₹${r.netPay.toLocaleString('en-IN')}</strong></td>
+                <td>${pill(r.status)}</td>
+                ${canManage ? `<td>${r.status === 'pending' ? '<button class="btn btn-ghost payBtn">Mark paid</button>' : '—'}</td>` : ''}
+              </tr>`).join('') : `<tr><td colspan="7"><div class="empty-state"><h3>No payroll records for this month</h3></div></td></tr>`}
+          </tbody>
+        </table></div>
+      </div>`;
+
+    if (canManage) {
+      document.getElementById('addBtn').addEventListener('click', showForm);
+      root.querySelectorAll('.payBtn').forEach((b) => b.addEventListener('click', async (e) => {
+        const id = e.target.closest('tr').dataset.id;
+        try { await api(`/api/salary/${id}/pay`, { method: 'PUT' }); toast('Marked as paid'); render(); }
+        catch (err) { toast(err.message, 'error'); }
+      }));
+    }
+  }
+
+  async function showForm() {
+    const employees = await api('/api/employees');
+    const formHost = document.getElementById('formHost');
+    formHost.innerHTML = `
+      <div class="panel" style="background:var(--paper);">
+        <h3>Generate payslip</h3>
+        <div class="field-row">
+          <div><label>Employee</label>
+            <select id="f_emp">${employees.map((e) => `<option value="${e._id}" data-base="${e.baseSalary}" data-name="${e.name}">${e.name} — ${e.designation || e.role}</option>`).join('')}</select>
+          </div>
+          <div><label>Bonus (₹)</label><input id="f_bonus" type="number" value="0" /></div>
+          <div><label>Deductions (₹)</label><input id="f_ded" type="number" value="0" /></div>
+        </div>
+        <button class="btn btn-primary" id="submitSalary">Generate</button>
+        <button class="btn btn-ghost" id="cancelSalary">Cancel</button>
+      </div>`;
+    document.getElementById('cancelSalary').addEventListener('click', () => { formHost.innerHTML = ''; });
+    document.getElementById('submitSalary').addEventListener('click', async () => {
+      const sel = document.getElementById('f_emp');
+      const opt = sel.options[sel.selectedIndex];
+      const payload = {
+        employee: sel.value,
+        employeeLabel: opt.dataset.name,
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
+        baseSalary: Number(opt.dataset.base),
+        bonus: Number(document.getElementById('f_bonus').value || 0),
+        deductions: Number(document.getElementById('f_ded').value || 0),
+      };
+      try {
+        await api('/api/salary', { method: 'POST', body: JSON.stringify(payload) });
+        toast('Payslip generated');
+        render();
+      } catch (err) { toast(err.message, 'error'); }
+    });
+  }
+
+  render().catch((err) => {
+    root.innerHTML = `<div class="empty-state"><h3>Couldn't load payroll</h3><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

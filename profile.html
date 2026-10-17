@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Profile · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script>
+  const user = Auth.requireAuth();
+  const root = renderShell('profile', 'Profile');
+
+  function row(label, value) {
+    return `<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);">
+      <span style="font-size:0.82rem;color:var(--ink-faint);">${label}</span>
+      <strong style="font-size:0.88rem;">${value ?? '—'}</strong>
+    </div>`;
+  }
+
+  async function render() {
+    root.innerHTML = '<p>Loading…</p>';
+
+    let details = '';
+    try {
+      if (user.role === 'student') {
+        const [me] = await api('/api/students');
+        if (me) {
+          details = row('Student ID', me.studentId) + row('Class', `${me.className} · ${me.section}`)
+            + row('Guardian', me.guardianName) + row('Guardian phone', me.guardianPhone)
+            + row('Status', me.status);
+        }
+      } else {
+        const list = await api('/api/employees');
+        const me = list[0];
+        if (me) {
+          details = row('Employee ID', me.employeeId) + row('Department', me.department)
+            + row('Designation', me.designation) + row('Joined', formatDate(me.joinDate))
+            + row('Status', me.status);
+        }
+      }
+    } catch { /* non-fatal — account row still renders below */ }
+
+    root.innerHTML = `
+      <div class="grid-2">
+        <div class="panel">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+            <div class="avatar" style="width:52px;height:52px;font-size:1.1rem;background:var(--teal);color:#fff;">${initials(user.name)}</div>
+            <div><h2 style="margin-bottom:2px;">${user.name}</h2><span class="pill pill-active" style="text-transform:capitalize;">${user.role}</span></div>
+          </div>
+          ${row('Username', user.username)}
+          ${details}
+        </div>
+        <div class="panel">
+          <h3>Session</h3>
+          <p style="font-size:0.85rem;">You're signed in on this device. Logging out will end this session and you'll need your password again to sign back in.</p>
+          <button class="btn btn-danger" onclick="Auth.logout()">Log out</button>
+        </div>
+      </div>`;
+  }
+
+  render();
+</script>
+</body>
+</html>

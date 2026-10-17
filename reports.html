@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reports · HS ERP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/theme.css" />
+</head>
+<body>
+<script src="/assets/js/api.js"></script>
+<script src="/assets/js/shell.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+  const user = Auth.requireAuth(['teacher', 'hr', 'md']);
+  const root = renderShell('reports', 'Reports');
+
+  async function render() {
+    root.innerHTML = '<p>Loading…</p>';
+    const records = await api('/api/attendance');
+
+    if (!records.length) {
+      root.innerHTML = '<div class="empty-state"><h3>Not enough data yet</h3><p>Mark some attendance first — reports will build up from there.</p></div>';
+      return;
+    }
+
+    // Aggregate by group
+    const byGroup = {};
+    const byPerson = {};
+    records.forEach((r) => {
+      const g = r.group || 'Unassigned';
+      byGroup[g] = byGroup[g] || { present: 0, absent: 0, leave: 0, 'half-day': 0 };
+      byGroup[g][r.status]++;
+
+      byPerson[r.personLabel] = byPerson[r.personLabel] || { present: 0, total: 0, group: r.group };
+      byPerson[r.personLabel].total++;
+      if (r.status === 'present') byPerson[r.personLabel].present++;
+    });
+
+    const groups = Object.keys(byGroup);
+    const leaderboard = Object.entries(byPerson)
+      .map(([name, v]) => ({ name, group: v.group, rate: Math.round((v.present / v.total) * 100) }))
+      .sort((a, b) => a.rate - b.rate)
+      .slice(0, 8);
+
+    root.innerHTML = `
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head"><h2>Attendance by group</h2></div>
+          <canvas id="groupChart" height="220"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Needs attention</h2><p style="font-size:0.78rem;">Lowest attendance rate</p></div>
+          <div class="table-wrap"><table>
+            <thead><tr><th>Name</th><th>Group</th><th class="num">Rate</th></tr></thead>
+            <tbody>${leaderboard.map((p) => `<tr><td>${p.name}</td><td>${p.group || '—'}</td><td class="num"><span class="pill ${p.rate >= 75 ? 'pill-present' : 'pill-absent'}">${p.rate}%</span></td></tr>`).join('')}</tbody>
+          </table></div>
+        </div>
+      </div>`;
+
+    new Chart(document.getElementById('groupChart'), {
+      type: 'bar',
+      data: {
+        labels: groups,
+        datasets: [
+          { label: 'Present', data: groups.map((g) => byGroup[g].present), backgroundColor: '#557a63' },
+          { label: 'Absent', data: groups.map((g) => byGroup[g].absent), backgroundColor: '#a8432f' },
+          { label: 'Leave', data: groups.map((g) => byGroup[g].leave), backgroundColor: '#b9842c' },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: '#eceeec' } } },
+        plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { family: 'IBM Plex Sans', size: 11 } } } },
+      },
+    });
+  }
+
+  render().catch((err) => {
+    root.innerHTML = `<div class="empty-state"><h3>Couldn't load reports</h3><p>${err.message}</p></div>`;
+  });
+</script>
+</body>
+</html>

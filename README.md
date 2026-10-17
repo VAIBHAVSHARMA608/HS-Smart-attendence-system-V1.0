@@ -1,84 +1,95 @@
-# HS Smart Attendance System
+# HS ERP
 
-A multi-portal (Student / Teacher / HR / MD) attendance & chat demo: static HTML/CSS frontends
-plus an Express + MongoDB API, restructured to deploy to **Vercel** on the free Hobby tier.
+A campus management ERP — Student, Teacher, HR and MD all in one app, with role-based
+attendance, people records, payroll and a notice board. Express + MongoDB API, deployed to
+**Vercel** on the free Hobby tier; frontend is dependency-free HTML/CSS/JS with Chart.js for
+charts.
 
-## What changed to make this deployable
+## What's in it
 
-The original project was a standalone Express server (`app.listen`) pointed at a hardcoded
-`mongodb://localhost:27017`, with the frontend calling `http://localhost:4000` directly. None of
-that works on Vercel, which runs your backend as short-lived serverless functions with no local
-disk database. Specific fixes:
+One unified app instead of four separate portals — everyone logs in at `/index.html` and lands
+on the same set of pages, with content and permissions adapted to their role:
 
-- **Serverless entrypoint** — `Backend/app.js` now just builds and exports the Express app;
-  `Backend/server.js` only calls `.listen()` for local dev, and `api/index.js` wraps the same app
-  with `serverless-http` for Vercel. `vercel.json` rewrites `/api/*` to that one function, and
-  Vercel serves every other file (all the portal HTML/CSS) as static assets automatically.
-- **MongoDB Atlas + connection caching** — `Backend/config/db.js` now reads `MONGODB_URI` from an
-  environment variable and caches the connection on `global`, so a warm serverless invocation
-  reuses it instead of opening a new connection on every request. That's the main thing that
-  keeps you inside MongoDB Atlas's free-tier connection limit and Vercel's free execution minutes
-  — without it, traffic could exhaust your connection quota fast.
-- **Fixed real bugs**:
-  - `models/user.js` vs. `require('../models/User')` — this only worked by accident on
-    case-insensitive filesystems (Windows/Mac). Linux, and Vercel's build, is case-sensitive, so
-    the API would have crashed on deploy. Renamed the file to `User.js`.
-  - `Backend/routes/auth.js` had a leftover **client-side** `fetch(...)` snippet pasted directly
-    into the server route file, referencing undefined browser variables. Removed it — the file
-    now only exports the Express router.
-  - `server.js` never mounted the `/api/auth` or `/api/users` routes, and there was a duplicate,
-    unused `routes/config/db.js`. Cleaned up.
-  - `routes/addusers.js` was an empty file. Implemented it as a guarded `POST /api/users` route
-    for seeding/creating accounts.
-  - Passwords were stored and compared in plain text. Now hashed with `bcryptjs`.
-- **Relative API URLs** — every frontend page called `http://localhost:4000/api/...` directly.
-  Since Vercel serves the frontend and the API from the same domain, all of those are now relative
-  (`/api/chat`, `/api/auth/login`), so they work locally and in production without CORS issues.
+| Page | Student | Teacher | HR / MD |
+|---|---|---|---|
+| **Dashboard** | own attendance %, notices | class size, today's attendance | org-wide stats, payroll total |
+| **Attendance** | read-only calendar of own record | mark their own class, see recent records | mark/view any class or staff group |
+| **People** | — | view student roster | full CRUD on students and staff |
+| **Salary** | — | view own payslips | generate payslips, mark as paid |
+| **Reports** | — | attendance-by-group chart + needs-attention list (own class only) | same, school-wide |
+| **Announcements** | read notices | post + read | post + read + delete |
+| **Profile** | own record | own record | own record |
 
-### Known limitation (unchanged from the original)
+Backend: JWT-based auth (bcrypt-hashed passwords), role middleware on every route, and six
+resources — `students`, `employees`, `attendance`, `salary`, `announcements`, `dashboard` — all
+under `Backend/routes/`.
 
-Only the MD login page (`HR/md side/mdlogin.html`) actually calls `/api/auth/login`. The
-Student, Teacher, and HR login pages check a hardcoded username/password in client-side
-JavaScript and never touch the backend — that was true in the original project too. It's fine for
-a demo, but anyone can read the credentials in the page source. Say the word if you'd like me to
-wire those three pages to the real `/api/auth/login` route as well.
+## Design
 
-## Deploy it yourself
+A deliberately institutional look rather than a generic SaaS template: deep teal structural
+color with a brass accent, IBM Plex Serif for headings paired with IBM Plex Sans for UI/data,
+flat hairline-bordered panels instead of shadowed cards, and a persistent sidebar shell shared
+by every page (`assets/js/shell.js` renders it and the role-based nav from one place, so there's
+no duplicated markup to keep in sync).
 
-1. **Create a free MongoDB Atlas cluster** (M0 tier, $0/month): https://www.mongodb.com/cloud/atlas/register
-   Add a database user, allow access from `0.0.0.0/0` (or Vercel's IPs) under Network Access, and
-   copy the connection string.
-2. **Push this folder to a GitHub repo.**
-3. **Import the repo into Vercel** (https://vercel.com/new) — no build settings need changing,
-   Vercel auto-detects the `/api` function and static files.
-4. In the Vercel project's **Settings → Environment Variables**, add:
-   - `MONGODB_URI` — your Atlas connection string, with `/hssmart` as the database name
-   - `ADMIN_SEED_SECRET` — any long random string
-5. **Deploy.**
-6. **Seed the demo users** — either run `npm run seed` locally with `MONGODB_URI` set in a `.env`
-   file (copy `.env.example`), or `POST` to `https://<your-app>.vercel.app/api/users` with header
-   `x-seed-secret: <your ADMIN_SEED_SECRET>` and a JSON body like:
-   ```json
-   [{ "username": "mdmaster", "password": "md@2024", "role": "md" }]
+## Deploy
+
+1. **MongoDB Atlas** (free M0 tier): create a cluster, a database user, allow network access from
+   `0.0.0.0/0`, copy the connection string.
+2. **Push to GitHub**, then **import into Vercel** (vercel.com/new) — zero config needed, it
+   auto-detects `/api/index.js` as the serverless function and everything else as static files.
+3. In **Settings → Environment Variables** on the Vercel project, add:
+   - `MONGODB_URI` — your Atlas connection string (database name `hssmart` is assumed, but any
+     name works as long as it's in the URI)
+   - `JWT_SECRET` — any long random string (used to sign login tokens)
+4. **Deploy.**
+5. **Seed demo data** — run locally against your Atlas cluster:
+   ```bash
+   npm install
+   cp .env.example .env   # fill in MONGODB_URI
+   npm run seed
    ```
+   This creates 4 demo students, 4 demo staff (two teachers, one HR, one MD), two weeks of
+   attendance history, this month's payroll, and a welcome notice.
 
 ## Local development
 
 ```bash
 npm install
-cp .env.example .env   # fill in MONGODB_URI (Atlas, or a local mongod)
-npm run seed            # creates the demo accounts
-npm run dev              # starts Backend/server.js on http://localhost:4000
+cp .env.example .env
+npm run seed
+npm run dev   # starts Backend/server.js on http://localhost:4000
 ```
-Open any of the portal HTML files directly, or serve the whole folder with `npx serve .` so the
-relative `/api/...` calls resolve to the same server (recommended: use `vercel dev` instead, which
-runs the static files and the `/api` function together exactly like production).
+Then open `http://localhost:4000/index.html` — the API and static pages are served from the same
+Express app locally, so no separate frontend server or CORS setup is needed. (`vercel dev` works
+the same way and matches production more closely if you want to test the serverless path.)
+
+## Demo logins
+
+| Role | Username | Password |
+|---|---|---|
+| Student | `student123` | `password` |
+| Teacher | `teacher01` | `teach@123` |
+| HR | `hradmin` | `hr@123` |
+| MD | `mdmaster` | `md@2024` |
 
 ## Staying within free-tier limits
 
-- Vercel Hobby: 100 GB-hours of serverless execution/month, no charge — a small attendance app for
-  a few classes won't come close.
-- MongoDB Atlas M0: free forever, 512 MB storage, shared RAM — plenty for this schema.
-- The connection caching in `config/db.js` is the important piece: without it, each cold-started
-  function invocation opens a brand-new MongoDB connection, which can exhaust Atlas's connection
-  limit under any real traffic and slow every request down.
+- **Connection caching** (`Backend/config/db.js`) reuses the MongoDB connection across warm
+  serverless invocations instead of opening a new one per request — this is what keeps you under
+  Atlas's free-tier connection cap under real traffic.
+- **Vercel Hobby** gives 100 GB-hours of function execution a month at no cost; a school-scale ERP
+  with modest traffic won't come close.
+- **MongoDB Atlas M0** is free forever with 512 MB storage — comfortably enough for this schema
+  (a few thousand students/staff and a year of daily attendance rows is only a few MB).
+
+## Known scope limits
+
+- Passwords are set once at account creation (no self-service reset flow yet).
+- Attendance is marked per class/department as a whole, not per-subject/period.
+- No real-time chat — the old 1:1 chat was replaced with a notice board, which fits an ERP's
+  announcement needs better, but if you want live messaging back, it's a reasonably small add-on
+  on top of the existing `Announcement` model pattern.
+
+Want any of these built out further — password reset, CSV export, attendance by period, a
+different role's dashboard layout? Just ask.
